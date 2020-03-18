@@ -23,9 +23,29 @@ function setup() {
   deathRateSlider.changed(reset);
   diseaseProbabilitySlider.changed(reset);
 
-  diseaseProbabilitySlider.parent('hyper-parameters');
-  deathRateSlider.parent('hyper-parameters');
-  immunizationRateSlider.parent('hyper-parameters');
+  // diseaseProbabilitySlider.parent('hyper-parameters');
+
+  group = createDiv('');
+  group.position(30, 30);  
+  label = createSpan(' Disease Probability');
+  diseaseProbabilitySlider.parent(group);
+  label.parent(group);
+  group.parent('hyper-parameters');
+
+  group = createDiv('');
+  group.position(30, 60);  
+  label = createSpan(' Death Rate');
+  deathRateSlider.parent(group);
+  label.parent(group);
+  group.parent('hyper-parameters');
+
+  group = createDiv('');
+  group.position(30, 90);  
+  label = createSpan(' Immunization Rate');
+  immunizationRateSlider.parent(group);
+  label.parent(group);
+  group.parent('hyper-parameters');
+
 
   episodeManager = new EpisodeManager(3, 300);
   swarmManager = new SwarmManager(50, 0.1, 0.01);
@@ -41,10 +61,6 @@ function draw() {
     swarmManager.finishEpisode();
     swarmManager.initEpisode(0.8, 0.05, 0.01);
   }
-
-  // text('Immunization Rate', immunizationRateSlider.x * 2 + immunizationRateSlider.width, 35);
-  // text('Death Rate', deathRateSlider.x * 2 + deathRateSlider.width, 65);
-  // text('Disease Probability', diseaseProbabilitySlider.x * 2 + diseaseProbabilitySlider.width, 95);
   
   swarmManager.updateAll(episodeManager);
   stats.update();

@@ -8,14 +8,14 @@ class SwarmManager {
     // TODO: Create all agents from the loaded genes.
   }
 
-  initEpisode() {
+  initEpisode(diseaseProbability, deathRate, ImmunizationRate) {
 
     this.agents.sort((agent_1, agent_2) => agent_1.getScore() - agent_2.getScore());
     // TODO: Pick half of best
 
     // Add new agents into the mix
     for (let i = this.agents.length; i < this.numAgents; i++) {
-      let agent = new Agent();
+      let agent = new Agent(diseaseProbability, deathRate, ImmunizationRate);
       // TODO: Give the new agent genes from roulette wheel (high prob to best gene (best = max of agent.getScore()))
       // TODO: Perform a perturbation of this.mutation on the genes.
       this.agents.push(agent);
