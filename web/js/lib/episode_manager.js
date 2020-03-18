@@ -22,4 +22,9 @@ class EpisodeManager {
       }
     }
   }
+  reset() {
+    this.episodeNumber = 1;
+    this.timeStep = 0;
+    this.frameNumber = 0.
+  }
 }

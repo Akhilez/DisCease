@@ -30,17 +30,24 @@
 
   <h1>DisCease</h1>
 
-  <div id="stats">
+  <div class = "row" id="stats">
     <p id="message_p"></p>
   </div>
-
-  <div id="sketch-holder"><!-- Our sketch will go here! --></div>
+  <div class = "row" id="sketch-and-params">
+  	<div class = "col-9" id="sketch-holder"></div>
+  	<div class = "col-4" id="hyper-parameters"></div>
+  </div>
+  <div class="graph-and-stats">
+  	
+  </div>
+ 
 
 </div>
 
 <!-- -------------------------------------------------------------- -->
 
 <script src="js/vendor/p5.js"></script>
+<script scr="js/vendor/p5.dom.js"></script>
 <!-- <script src="js/vendor/ml5.js"></script> -->
 <script src="js/vendor/jquery.js"></script>
 <script src="js/vendor/bootstrap.js"></script>

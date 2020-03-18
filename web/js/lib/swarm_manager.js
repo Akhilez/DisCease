@@ -74,4 +74,8 @@ class SwarmManager {
     return p5.Vector.sub(center, agent.location).normalize().mult(this.forceOfAttraction); // Vector from agent to center.
   }
 
+  reset(introductionRate) {
+    this.diseaseIntroductionRate = introductionRate;
+  }
+
 }

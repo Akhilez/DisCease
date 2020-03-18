@@ -8,7 +8,7 @@ const state = {
 
 class Agent {
 
-  constructor(deflections) {
+  constructor (diseaseIdentificationProbability, deathRate, immunizationRate, deflections) {
     this.mass = 1;
     this.maxVelocity = 2;
     this.drag = 0.005;
@@ -18,12 +18,12 @@ class Agent {
     this.acceleration = createVector(random(-width, width), random(-height, height));
 
     // Hyper-parameters
-    this.diseaseIdentificationProbability = 0.8;
+    this.diseaseIdentificationProbability = diseaseIdentificationProbability; //*
     this.contagionRate = 0.005;
     this.visualRange = 30;
     this.zombificationRate = 0.002;
-    this.deathRate = 0.0015;
-    this.immunizationRate = 0.0015;
+    this.deathRate = deathRate; //*
+    this.immunizationRate = immunizationRate; //*
     this.immunizationLossRate = 0.001;
 
     // Internal State Variables:
@@ -62,7 +62,6 @@ class Agent {
     this.applyForce(this.getNextMove(neighbours).mult(0.1));
 
     this._updateLocation();
-
   }
 
   display() {
