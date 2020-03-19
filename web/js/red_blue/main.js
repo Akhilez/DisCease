@@ -1,10 +1,9 @@
 let grid;
-let agents;
 
 function setup() {
   let canvas = createCanvas(300, 300);
   canvas.parent('sketch-holder');
-  grid = new Grid(10);
+  grid = new Grid(50);
   grid.fillAgentsRandomly(90);
 
 }

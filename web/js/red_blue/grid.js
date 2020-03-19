@@ -4,15 +4,29 @@ const cellState = {
   red: 1,
 };
 
+let k_neighbours = 4;
+
+class Agent {
+  constructor (x, y, value) {
+    this.x = x;
+    this.y = y;
+    this.value = value;
+  }
+}
+
 class Grid {
   constructor(nRows) {
     this.nRows = nRows;
 
     this.cellSize = width / this.nRows;
     this.matrix = this.createMatrix(this.nRows);
+
+    this.selectionIndices = [];
+    this.currentAgent = [];
   }
 
   update() {
+    this.currentAgent = this.getNextAgent();
 
   }
 
@@ -29,11 +43,33 @@ class Grid {
         else cellColor = color('white');
 
         fill(cellColor);
-        square(i*this.cellSize, j*this.cellSize, this.cellSize);
+        square(i * this.cellSize, j * this.cellSize, this.cellSize);
 
       }
     }
   }
+
+  getNextAgent(){
+    if (this.selectionIndices.length === 0) {
+      this.selectionIndices = []; // TODO: Shuffle all indices
+    }
+
+    this.selectionIndices.pop();
+  }
+
+  isAgentHappy(x, y) {
+    let agentType = this.matrix[x][y];
+    let numSameNeighbours = 0;
+    for (let i = (x - 1) % this.nRows; i <= (x + 1) % this.nRows; i = (i + 1) % this.nRows) {
+      for (let j = (y - 1) % this.nRows; j <= (y + 1) % this.nRows; j = (j + 1) % this.nRows) {
+        if (this.matrix[i][j] === agentType)
+          numSameNeighbours++;
+      }
+    }
+
+    return numSameNeighbours >= k_neighbours;
+  }
+
 
   fillAgentsRandomly(size) {
     let halfSize = Math.floor(size / 2);
