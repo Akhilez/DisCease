@@ -120,9 +120,9 @@ class Grid {
     let emptyCells = [];
     for (let i = 0; i < this.nRows; i++)
       for (let j = 0; j < this.nRows; j++)
-        if (this.matrix[i][j] === cellState.empty)
+        if (this.matrix[i][j] === cellState.empty) {
           emptyCells.push([i, j]);
-    console.log(`Empties: ${emptyCells}`);
+        }
     return emptyCells;
   }
 
