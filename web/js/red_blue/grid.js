@@ -1,16 +1,16 @@
+let k_neighbours = 4;
+
 const cellState = {
   empty: 0,
   blue: -1,
   red: 1,
 };
 
-let k_neighbours = 4;
-
 class Agent {
   constructor(x, y, value) {
     this.x = x;
     this.y = y;
-    this.value = value;
+    this.type = value;
   }
 }
 
@@ -21,18 +21,14 @@ class Grid {
     this.cellSize = width / this.nRows;
     this.matrix = this.createMatrix(this.nRows);
 
-    this.selectionIndices = [];
-    this.currentAgent = [];
-
     this.relocator = relocator;
   }
 
   update() {
-    this.currentAgent = this.getNextAgent();
-    if (!this.isAgentHappy(this.currentAgent.x, this.currentAgent.y)) {
-      // TODO: Follow a scheme and move the agent.
-      this.relocator.relocate(this.currentAgent, this);
-      console.log(`I'm unhappy! ${this.currentAgent.x}, ${this.currentAgent.y}`);
+    let currentAgent = this.getNextAgent();
+    if (currentAgent !== null) {
+      console.log(`Current agent = ${currentAgent.x}, ${currentAgent.y}, ${currentAgent.type}`);
+      this.relocator.relocate(currentAgent, this);
     }
   }
 
@@ -56,23 +52,29 @@ class Grid {
   }
 
   getNextAgent() {
-    if (this.selectionIndices.length === 0) {
-      for (let i = 0; i < this.nRows; i++) {
-        for (let j = 0; j < this.nRows; j++) {
-          this.selectionIndices.push(new Agent(i, j, this.matrix[i][j]))
-        }
+    let selectionIndices = [];
+    for (let i = 0; i < this.nRows; i++) {
+      for (let j = 0; j < this.nRows; j++) {
+        if (this.matrix[i][j] !== cellState.empty && !this.isAgentHappy(i, j, this.matrix[i][j]))
+          selectionIndices.push(new Agent(i, j, this.matrix[i][j]))
       }
-      this.shuffle(this.selectionIndices);
     }
-
-    return this.selectionIndices.pop();
+    this.shuffle(selectionIndices);
+    if (selectionIndices.length === 0)
+      return null;
+    return selectionIndices.pop();
   }
 
-  isAgentHappy(x, y) {
-    let agentType = this.matrix[x][y];
+  isAgentHappy(x, y, agentType) {
+    return this.getHappyScore(x, y, agentType) >= k_neighbours;
+  }
+
+  getHappyScore(x, y, agentType) {
     let numSameNeighbours = 0;
     for (let i = x - 1; i <= x + 1; i = i + 1)
       for (let j = y - 1; j <= y + 1; j = j + 1) {
+        if (i === x && j === y)
+          continue;
         let newI = i;
         let newJ = j;
         if (i === -1)
@@ -88,9 +90,8 @@ class Grid {
           numSameNeighbours++;
       }
 
-    return numSameNeighbours >= k_neighbours;
+    return numSameNeighbours;
   }
-
 
   fillAgentsRandomly(size) {
     this.matrix = this.createMatrix(this.nRows);
@@ -113,6 +114,16 @@ class Grid {
       let y = shuffledIndices[i][1];
       this.matrix[x][y] = cellState.red;
     }
+  }
+
+  getEmptyCells() {
+    let emptyCells = [];
+    for (let i = 0; i < this.nRows; i++)
+      for (let j = 0; j < this.nRows; j++)
+        if (this.matrix[i][j] === cellState.empty)
+          emptyCells.push([i, j]);
+    console.log(`Empties: ${emptyCells}`);
+    return emptyCells;
   }
 
   createMatrix(n) {
