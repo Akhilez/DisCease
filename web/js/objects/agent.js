@@ -1,58 +1,47 @@
 const state = {
-  diseased: {
-    color: 'red',
-  },
-  healthy: {
-    color: 'white',
-  },
-  immune: {
-    color: 'green',
-  },
-  zombie: {
-    color: 'black',
-  },
-  dead: {
-    color: 'yellow',
-  }
+  diseased: 'diseased',
+  healthy: 'healthy',
+  immune: 'immune',
+  zombie: 'zombie',
+  dead: 'dead',
 };
 
 class Agent {
 
-  constructor(deflections) {
+  constructor (diseaseIdentificationProbability, deathRate, immunizationRate, deflections) {
     this.mass = 1;
-    this.maxVelocity = 3;
+    this.maxVelocity = 2;
+    this.drag = 0.005;
 
-    this.location = createVector(width / 2, height / 2);
+    this.location = createVector(random(10, width - 10), random(10, height - 10));
     this.velocity = createVector(0.0, 0.0);
-    this.acceleration = createVector(0.0, 0.0);
+    this.acceleration = createVector(random(-width, width), random(-height, height));
 
     // Hyper-parameters
-    this.diseaseIdentificationProbability = 0.8;
-    this.contagionRate = 0.1;
-    this.visualRange = 10;
-    this.zombificationRate = 0.01;
-    this.deathRate = 0.3;
+    this.diseaseIdentificationProbability = diseaseIdentificationProbability; //*
+    this.contagionRate = 0.005;
+    this.visualRange = 30;
+    this.zombificationRate = 0.002;
+    this.deathRate = deathRate; //*
+    this.immunizationRate = immunizationRate; //*
+    this.immunizationLossRate = 0.001;
 
     // Internal State Variables:
     this.healthState = state.healthy;
     this.numDiseased = 0;
     this.numEpisodesSurvived = 0;
+    this.numDiseaseSpread = 1;  // Number of times this guy spread its disease to others.
 
     // Genetic Information:
     if (deflections != null)
-      this.deflection = deflections;
+      this.deflections = deflections;
     else
-      this.deflection = {
-        diseased: random(-1, 1),
-        healthy: random(-1, 1),
-        immune: random(-1, 1),
-        zombie: random(-1, 1),
-      };
+      this.deflections = this.getPerfectDeflections();  // this.getRandomDeflections();
 
   }
 
-  getScore(){
-    return this.numEpisodesSurvived / this.numDiseased;
+  getScore() {
+    return this.numEpisodesSurvived / this.numDiseased / this.numDiseaseSpread;
   }
 
   setVelocity(velocity) {
@@ -66,64 +55,79 @@ class Agent {
   }
 
   update(allAgents) {
+
     let neighbours = this.getObservableNeighbours(allAgents);
 
-    this.checkBounds();
     this.checkContaminated(neighbours);
-    this.applyForce(this.getNextMove(neighbours));
+    this.applyForce(this.getNextMove(neighbours).mult(0.1));
 
     this._updateLocation();
-
   }
 
   display() {
-    fill(color(this.healthState.color));
+    fill(color(this._getColor()));
+    stroke(200);
     ellipse(this.location.x, this.location.y, 10, 10);
   }
 
-  _updateLocation(){
+  _updateLocation() {
+    this.checkBounds();
     this.setVelocity(p5.Vector.add(this.velocity, this.acceleration));
+    this.velocity.mult(1 - this.drag);
     this.location.add(this.velocity);
     this.acceleration.mult(0);
   }
 
-  getNextMove(neighbours){
-    let nextMove = createVector(0.0, 0.0);
+  getNextMove(neighbours) {
 
-    for (let neighbour of neighbours){
+    if (neighbours.length === 1)
+      return createVector(0, 0);
+
+    let nextMove = createVector(0, 0);
+
+    for (let neighbour of neighbours) {
+      nextMove = createVector(0.0, 0.0);
+
       let observedHealth = state.healthy;
-      if (random() <= this.diseaseIdentificationProbability) {
+      if (random() <= this.diseaseIdentificationProbability)
         observedHealth = neighbour.healthState;
-      }
-      // TODO: nextMove += (distance vector from this.location to neighbour.location) * this.deflection(neighbour.healthState)
+
+      let pointer = p5.Vector.sub(neighbour.location, this.location);
+      pointer.mult(this.deflections[this.healthState][neighbour.healthState]);
+
+      nextMove.add(pointer);
+      nextMove.normalize();
     }
 
     return nextMove;
   }
 
   checkBounds() {
-    if (this.location.x > width || this.location.x < 0) {
-      this.velocity.x = this.velocity.x * -1;
+    let padding = 5;
+    if (this.location.x > width - padding) {
+      this.velocity.x = -Math.abs(this.velocity.x);
+      this.acceleration.x = 0;
+    } else if (this.location.x < padding) {
+      this.velocity.x = Math.abs(this.velocity.x);
+      this.acceleration.x = 0;
     }
-    if (this.location.y > height || this.location.y < 0) {
-      this.velocity.y = this.velocity.y * -1;
+    if (this.location.y > height - padding) {
+      this.velocity.y = -Math.abs(this.velocity.y);
+      this.acceleration.y = 0;
+    } else if (this.location.y < padding) {
+      this.velocity.y = Math.abs(this.velocity.y);
+      this.acceleration.y = 0;
     }
   }
 
   getObservableNeighbours(allAgents) {
-    // TODO: Implement get neighbours.
-    /*
-    I think performing a euclidean distance from this.location to all other agents will be computationally challenging.
-    So, lets draw a square box of size 2*this.visualRange around the agent and find agents whose location fall into this box.
-    This should be a circle instead of a square, but circle will add more computational complexity.
-     */
 
     let neighbors = [];
 
     for (let agent of allAgents) {
-    	if(this.isInVisualRange(this.location.x, this.location.y, agent)) {
-    		neighbors.push(agent);
-    	}
+      if (this.isInVisualRange(this.location.x, this.location.y, agent)) {
+        neighbors.push(agent);
+      }
     }
 
     return neighbors;
@@ -131,38 +135,172 @@ class Agent {
 
   //checking if in same range
   isInVisualRange(x, y, agent) {
-  	return (Math.abs(agent.location.x - x) >= this.visualRange && Math.abs(agent.location.y - y) >= this.visualRange);
+    return (Math.abs(agent.location.x - x) <= this.visualRange && Math.abs(agent.location.y - y) <= this.visualRange);
   }
 
   checkContaminated(neighbours) {
 
-    if(this.healthState === state.dead || this.healthState === state.zombie) {
-    	return;
-    }
+    let px = random();
 
-    if(this.healthState === state.diseased) {
-      if(random() <= this.zombificationRate) {
-        this.healthState = state.zombie;
+    if (this.healthState === state.healthy) {
+      if (px <= this.immunizationRate) {
+        this.healthState = state.immune;
         return;
       }
     }
 
+    if (this.healthState === state.dead) {
+      return;
+    }
+
+    if (this.healthState === state.immune) {
+      if (px <= this.immunizationLossRate) {
+        this.healthState = state.healthy;
+      }
+      return;
+    }
+
+    if (this.healthState === state.zombie) {
+      if (px <= this.deathRate) {
+        this.healthState = state.dead;
+      }
+      return;
+    }
+
+    if (this.healthState === state.diseased) {
+      if (px * this.numDiseaseSpread / this.numDiseaseSpread <= this.deathRate) {
+        this.healthState = state.dead;
+        return;
+      }
+      if (px <= this.immunizationRate) {
+        this.healthState = state.immune;
+        return;
+      }
+      if (px <= this.zombificationRate) {
+        this.healthState = state.zombie;
+        return;
+      }
+      return;
+    }
+
     let totalContagion = 0.0;
 
-    for (let neighbour of neighbours){
-      if (neighbour.healthState in [state.diseased, state.zombie]) {
+    for (let neighbour of neighbours) {
+      if (neighbour.healthState === state.diseased || neighbour.healthState === state.zombie) {
         totalContagion += this.contagionRate;
       }
     }
 
-    if (random() <= totalContagion) {
-      if (random() <= this.deathRate){
-        this.healthState = state.dead;
-      } else{
-        this.healthState = state.diseased;
-      }
+    if (px <= totalContagion) {
+      this.healthState = state.diseased;
+      this.numDiseased += 1;
+      neighbours.forEach(neighbour => neighbour.numDiseaseSpread++);
     }
 
+  }
+
+  _getColor() {
+    switch (this.healthState) {
+      case state.healthy:
+        return 'white';
+      case state.diseased:
+        return 'red';
+      case state.immune:
+        return 'green';
+      case state.zombie:
+        return 'black';
+      case state.dead:
+        return 200;
+    }
+  }
+
+  getVectorToCenter() {
+    let center = createVector(width / 2, height / 2);
+    return p5.Vector.sub(center, this.location);
+  }
+
+  getRandomSingleDeflection() {
+    return random(-0.1, 0.1);
+  }
+
+  getRandomDeflections() {
+    return {
+      'diseased': {
+        'diseased': this.getRandomSingleDeflection(),
+        'healthy': this.getRandomSingleDeflection(),
+        'immune': this.getRandomSingleDeflection(),
+        'zombie': this.getRandomSingleDeflection(),
+        'dead': 0,
+      },
+      'healthy': {
+        'diseased': this.getRandomSingleDeflection(),
+        'healthy': this.getRandomSingleDeflection(),
+        'immune': this.getRandomSingleDeflection(),
+        'zombie': this.getRandomSingleDeflection(),
+        'dead': 0,
+      },
+      'immune': {
+        'diseased': this.getRandomSingleDeflection(),
+        'healthy': this.getRandomSingleDeflection(),
+        'immune': this.getRandomSingleDeflection(),
+        'zombie': this.getRandomSingleDeflection(),
+        'dead': 0,
+      },
+      'zombie': {
+        'diseased': 0,
+        'healthy': 1,
+        'immune': 1,
+        'zombie': 0.5,
+        'dead': 0,
+      },
+      'dead': {
+        'diseased': 0,
+        'healthy': 0,
+        'immune': 0,
+        'zombie': 0,
+        'dead': 0,
+      },
+    }
+  }
+
+  getPerfectDeflections() {
+    return {
+      'diseased': {
+        'diseased': 0.5, // this.getRandomSingleDeflection(),
+        'healthy': -0.5, //this.getRandomSingleDeflection(),
+        'immune': -0.5, // this.getRandomSingleDeflection(),
+        'zombie': 0.5, // this.getRandomSingleDeflection(),
+        'dead': 0,
+      },
+      'healthy': {
+        'diseased': -0.5, // this.getRandomSingleDeflection(),
+        'healthy': 0.5, // this.getRandomSingleDeflection(),
+        'immune': 0.5, // this.getRandomSingleDeflection(),
+        'zombie': -0.5, // this.getRandomSingleDeflection(),
+        'dead': 0,
+      },
+      'immune': {
+        'diseased': -0.5, // this.getRandomSingleDeflection(),
+        'healthy': 0.5, // this.getRandomSingleDeflection(),
+        'immune': 0.5, // this.getRandomSingleDeflection(),
+        'zombie': -0.5, // this.getRandomSingleDeflection(),
+        'dead': 0,
+      },
+      'zombie': {
+        'diseased': 0,
+        'healthy': 1,
+        'immune': 1,
+        'zombie': 0.5,
+        'dead': 0,
+      },
+      'dead': {
+        'diseased': 0,
+        'healthy': 0,
+        'immune': 0,
+        'zombie': 0,
+        'dead': 0,
+      },
+    }
   }
 
 }

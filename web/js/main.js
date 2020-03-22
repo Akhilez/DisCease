@@ -1,13 +1,56 @@
 let swarmManager;
 let episodeManager;
-let fps = 10;
+let fps = 60;
+let stats;
+let immunizationRateSlider;
+let deathRateSlider;
+let diseaseProbabilitySlider;
+
+
 
 function setup() {
-  createCanvas(640, 480);
+  var canvas = createCanvas(300, 300);
   frameRate(fps);
 
-  episodeManager = new EpisodeManager(3, 60);
-  swarmManager = new SwarmManager(10, 0.1, 0.01);
+  // Move the canvas so it’s inside our <div id="sketch-holder">.
+  canvas.parent('sketch-holder');
+
+  diseaseProbabilitySlider = createSlider(0, 1000, 800);
+  deathRateSlider = createSlider(0, 1000, 5);
+  immunizationRateSlider = createSlider(0, 1000, 1);
+
+  immunizationRateSlider.changed(reset); 
+  deathRateSlider.changed(reset);
+  diseaseProbabilitySlider.changed(reset);
+
+  // diseaseProbabilitySlider.parent('hyper-parameters');
+
+  group = createDiv('');
+  group.position(30, 30);  
+  label = createSpan(' Disease Probability');
+  diseaseProbabilitySlider.parent(group);
+  label.parent(group);
+  group.parent('hyper-parameters');
+
+  group = createDiv('');
+  group.position(30, 60);  
+  label = createSpan(' Death Rate');
+  deathRateSlider.parent(group);
+  label.parent(group);
+  group.parent('hyper-parameters');
+
+  group = createDiv('');
+  group.position(30, 90);  
+  label = createSpan(' Immunization Rate');
+  immunizationRateSlider.parent(group);
+  label.parent(group);
+  group.parent('hyper-parameters');
+
+
+  episodeManager = new EpisodeManager(3, 300);
+  swarmManager = new SwarmManager(50, 0.1, 0.01);
+
+  stats = new Stats();
 }
 
 function draw() {
@@ -16,10 +59,19 @@ function draw() {
 
   if (episodeManager.isNewEpisode()) {
     swarmManager.finishEpisode();
-    swarmManager.initEpisode();
+    swarmManager.initEpisode(0.8, 0.05, 0.01);
   }
-
+  
   swarmManager.updateAll(episodeManager);
+  stats.update();
+
   background(230);
   swarmManager.displayAll();
+}
+
+function reset() {
+  episodeManager.reset();
+  swarmManager.reset(diseaseProbabilitySlider.value()/1000);
+  swarmManager.finishEpisode();
+  swarmManager.initEpisode(diseaseProbabilitySlider.value()/1000, deathRateSlider.value()/1000, immunizationRateSlider.value()/1000);
 }
