@@ -30,7 +30,6 @@ class RandomRelocator extends Relocator {
       if (i >= emptyCells.length)
         break;
       let happyScore = grid.getHappyScore(emptyCells[i][0], emptyCells[i][1], agent.type);
-      console.log(`Cell: ${emptyCells[i]} | Happiness: ${happyScore}`);
       if (happyScore >= k_neighbours) {
         maxHappyLocation = emptyCells[i];
         break;
@@ -40,11 +39,6 @@ class RandomRelocator extends Relocator {
         maxHappyLocation = emptyCells[i];
       }
     }
-
-    console.log("..");
-    console.log(`Current: ${agent.x}, ${agent.y} | new: ${maxHappyLocation} | ${agent.type} | ${grid.matrix[maxHappyLocation[0]][maxHappyLocation[1]]}`);
-    console.log(`Agent Happiness: ${agentHappyScore} | Max Happy score: ${maxHappyScore}`);
-    console.log(emptyCells);
 
     grid.matrix[agent.x][agent.y] = cellState.empty;
     grid.matrix[maxHappyLocation[0]][maxHappyLocation[1]] = agent.type;

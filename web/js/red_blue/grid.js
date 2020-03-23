@@ -1,5 +1,3 @@
-let k_neighbours = 4;
-
 const cellState = {
   empty: 0,
   blue: -1,
@@ -22,12 +20,13 @@ class Grid {
     this.matrix = this.createMatrix(this.nRows);
 
     this.relocator = relocator;
+
+    this.selectionIndices = [];
   }
 
   update() {
     let currentAgent = this.getNextAgent();
-    if (currentAgent !== null) {
-      console.log(`Current agent = ${currentAgent.x}, ${currentAgent.y}, ${currentAgent.type}`);
+    if (!this.isAgentHappy(currentAgent.x, currentAgent.y, currentAgent.type)) {
       this.relocator.relocate(currentAgent, this);
     }
   }
@@ -52,17 +51,15 @@ class Grid {
   }
 
   getNextAgent() {
-    let selectionIndices = [];
-    for (let i = 0; i < this.nRows; i++) {
-      for (let j = 0; j < this.nRows; j++) {
-        if (this.matrix[i][j] !== cellState.empty && !this.isAgentHappy(i, j, this.matrix[i][j]))
-          selectionIndices.push(new Agent(i, j, this.matrix[i][j]))
-      }
+    // Randomly pick an agent without replacement.
+    if (this.selectionIndices.length === 0) {
+      for (let i = 0; i < this.nRows; i++)
+        for (let j = 0; j < this.nRows; j++)
+          if (this.matrix[i][j] !== cellState.empty)
+            this.selectionIndices.push(new Agent(i, j, this.matrix[i][j]));
+      this.shuffle(this.selectionIndices);
     }
-    this.shuffle(selectionIndices);
-    if (selectionIndices.length === 0)
-      return null;
-    return selectionIndices.pop();
+    return this.selectionIndices.pop();
   }
 
   isAgentHappy(x, y, agentType) {
