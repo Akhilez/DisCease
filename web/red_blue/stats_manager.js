@@ -41,8 +41,8 @@ class StatsManager {
   perTrail() {
     this.currentTrail.totalHappiness = 0;  // TODO: Get the total happiness
     this.data.push(this.currentTrail);
-    this.currentTrail = {epochs: []};
     this.ui.updateTrail(this.trailManager, this.currentTrail);
+    this.currentTrail = {epochs: []};
   }
 
 }
