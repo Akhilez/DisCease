@@ -5,10 +5,11 @@ const cellState = {
 };
 
 class Agent {
-  constructor(x, y, value) {
+  constructor(x, y, value, friends) {
     this.x = x;
     this.y = y;
     this.type = value;
+    this.friends = friends;
   }
 }
 
@@ -56,7 +57,7 @@ class Grid {
       for (let i = 0; i < this.nRows; i++)
         for (let j = 0; j < this.nRows; j++)
           if (this.matrix[i][j] !== cellState.empty)
-            this.selectionIndices.push(new Agent(i, j, this.matrix[i][j]));
+            this.selectionIndices.push(new Agent(i, j, this.matrix[i][j], []));
       this.shuffle(this.selectionIndices);
     }
     return this.selectionIndices.pop();
@@ -121,6 +122,37 @@ class Grid {
       this.matrix[x][y] = cellState.red;
     }
   }
+
+  setAgentFriends(n) {
+
+    let friends = [];
+    let shuffledIndices = [];
+
+    for (let i = 0; i < this.nRows; i++) {
+      for (let j = 0; j < this.nRows; j++) {
+        if (this.matrix[i][j] !== cellState.empty) {
+          shuffledIndices.push([i, j]);
+        }
+      } 
+    }
+
+    this.shuffle(shuffledIndices);
+
+    for (let i = 0; i < this.nRows; i++) {
+      for (let j = 0; j < this.nRows; j++) {
+        if (this.matrix[i][j] !== cellState.empty) {
+          for (let k = 0; k < n; k++) {
+            friends.push(shuffledIndices[0][k]);
+          }
+         //this.matrix[i][j].friends = friends; HOW DO I ACCESS FRIENDS
+         friends = [];
+         this.shuffle(shuffledIndices);
+        }
+      } 
+    }
+  }
+
+
 
   getEmptyCells() {
     let emptyCells = [];

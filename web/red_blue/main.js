@@ -22,6 +22,7 @@ function setup() {
   statsManager = new StatsManager(grid, trailManager);
 
   grid.fillAgentsRandomly(numAgents);
+  grid.setAgentFriends(5);
 
 }
 
