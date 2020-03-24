@@ -2,7 +2,7 @@ class StatsManager {
   constructor(grid, trailManager) {
     this.grid = grid;
     this.trailManager = trailManager;
-    this.ui = new UIManager();
+    this.ui = new UIManager(trailManager);
 
     this.currentTrail = {epochs: []};
     this.currentEpoch = {timeSteps: []};
@@ -27,7 +27,7 @@ class StatsManager {
   perTimeStep() {
     let happiness = this.grid.getAvgHappiness();
     this.currentEpoch.timeSteps.push(happiness);
-    this.ui.updateTimeStep(this.trailManager, happiness);
+    this.ui.updateTimeStep(happiness);
   }
 
   perEpoch() {
@@ -36,7 +36,7 @@ class StatsManager {
     this.currentEpoch.avgHappiness /= this.currentEpoch.timeSteps.length;
 
     this.currentTrail.epochs.push(this.currentEpoch);
-    this.ui.updateEpoch(this.trailManager, this.currentEpoch);
+    this.ui.updateEpoch(this.currentEpoch);
     this.currentEpoch = {timeSteps: []};
   }
 
@@ -46,7 +46,7 @@ class StatsManager {
     this.currentTrail.avgHappiness /= this.currentTrail.epochs.length;
 
     this.data.push(this.currentTrail);
-    this.ui.updateTrail(this.trailManager, this.currentTrail);
+    this.ui.updateTrail(this.currentTrail);
     this.currentTrail = {epochs: []};
   }
 

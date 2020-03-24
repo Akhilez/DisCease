@@ -1,58 +1,62 @@
 class UIManager {
-  constructor () {
+  constructor(trailManager) {
+
+    this.trailManager = trailManager;
 
     this.epochCount = $("#epochBar");
     this.trailCount = $("#trailBar");
     this.allChartsRef = document.getElementById('allChartsContainer');
     this.statsTable = document.getElementById("statsTable");
 
-    this.currentTimeStepChart = this.createChart();
-    this.currentEpochChart = this.createChart();
-    this.currentTrailChart = this.createChart();
+    this.currentTimeStepChart = null;
+    this.currentEpochChart = null;
+    this.currentTrailChart = null;
+
+    this.initTrailChart();
+    this.initEpochChart();
+    this.initTimeStepChart();
 
   }
 
-  updateTimeStep (trailManager, happiness) {
-    this.currentTimeStepChart.data.labels.push(trailManager.timeStep);
+  updateTimeStep(happiness) {
+    this.currentTimeStepChart.data.labels.push(this.trailManager.timeStep);
     this.currentTimeStepChart.data.datasets[0].data.push(happiness);
 
     this.currentTimeStepChart.update();
   }
 
-  updateEpoch (trailManager, currentEpoch) {
-    this.epochCount.html(`${trailManager.epoch} / ${trailManager.numEpochsPerTrail}`);
-    this.epochCount.width(`${trailManager.epoch / trailManager.numEpochsPerTrail * 100}%`);
+  updateEpoch(currentEpoch) {
+    this.epochCount.html(`${this.trailManager.epoch} / ${this.trailManager.numEpochsPerTrail}`);
+    this.epochCount.width(`${this.trailManager.epoch / this.trailManager.numEpochsPerTrail * 100}%`);
 
-    this.currentTimeStepChart = this.createChart();
-    this.currentTimeStepChart.options.title.text = `TimeSteps v Happiness for Trail: ${trailManager.trail}, Epoch: ${trailManager.epoch}`;
+    this.initTimeStepChart();
 
     this.currentEpochChart.data.datasets[0].data.push(currentEpoch.avgHappiness);
-    this.currentEpochChart.data.labels.push(trailManager.epoch);
+    this.currentEpochChart.data.labels.push(this.trailManager.epoch);
     this.currentEpochChart.update();
 
-    this.addTableRow(trailManager.trail, trailManager.epoch, currentEpoch.avgHappiness);
+    this.addTableRow(this.trailManager.trail, this.trailManager.epoch, currentEpoch.avgHappiness);
 
   }
 
-  updateTrail (trailManager, currentTrail) {
-    if (trailManager.isComplete())
+  updateTrail(currentTrail) {
+    if (this.trailManager.isComplete())
       return;
 
-    this.trailCount.html(`${trailManager.trail} / ${trailManager.numTrails}`);
-    this.trailCount.width(`${trailManager.trail / trailManager.numTrails * 100}%`);
+    this.trailCount.html(`${this.trailManager.trail} / ${this.trailManager.numTrails}`);
+    this.trailCount.width(`${this.trailManager.trail / this.trailManager.numTrails * 100}%`);
 
-    this.currentEpochChart = this.createChart();
-    this.currentEpochChart.options.title.text = `Epochs vs Happiness (avg) for Trail: ${trailManager.trail}`;
+    this.initEpochChart();
 
     this.currentTrailChart.data.datasets[0].data.push(currentTrail.avgHappiness);
-    this.currentTrailChart.data.labels.push(trailManager.epoch);
+    this.currentTrailChart.data.labels.push(this.trailManager.trail);
     this.currentTrailChart.update();
 
-    this.addTableRow(trailManager.trail, '-', currentTrail.avgHappiness);
+    this.addTableRow(this.trailManager.trail, '-', currentTrail.avgHappiness);
 
   }
 
-  addTableRow (trail, epoch, happiness) {
+  addTableRow(trail, epoch, happiness) {
     let row = this.statsTable.insertRow();
 
     let colTrail = row.insertCell(0);
@@ -62,6 +66,23 @@ class UIManager {
     colTrail.innerHTML = trail;
     colEpoch.innerHTML = epoch;
     colHappiness.innerHTML = happiness;
+  }
+
+  initTimeStepChart() {
+    this.currentTimeStepChart = this.createChart();
+    this.currentTimeStepChart.options.title.text = `TimeSteps v Happiness for Trail: ${this.trailManager.trail}, Epoch: ${this.trailManager.epoch}`;
+  }
+
+  initEpochChart() {
+    this.currentEpochChart = this.createChart();
+    this.currentEpochChart.options.title.text = `Epochs vs Happiness (avg) for Trail: ${this.trailManager.trail}`;
+  }
+
+  initTrailChart() {
+    this.currentTrailChart = this.createChart();
+    this.currentTrailChart.type = 'bar';
+    this.currentTrailChart.options.title.text = `Trails v Happiness`;
+    this.currentTrailChart.update();
   }
 
   createChart() {
@@ -79,7 +100,7 @@ class UIManager {
     return timeStepChart;
   }
 
-  getNewChart(canvasRef){
+  getNewChart(canvasRef) {
     return new Chart(canvasRef, {
       type: 'line',
       data: {

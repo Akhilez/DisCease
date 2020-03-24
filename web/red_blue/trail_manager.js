@@ -9,11 +9,11 @@ class TrailManager {
   }
 
   isNewEpoch() {
-    return this.timeStep === 1;
+    return this.timeStep === this.timeStepsPerEpoch;
   }
 
   isNewTrail() {
-    return this.epoch === 1 && this.isNewEpoch();
+    return this.epoch === this.numEpochsPerTrail && this.isNewEpoch();
   }
 
   isComplete() {
