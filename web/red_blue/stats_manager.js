@@ -6,15 +6,15 @@ class StatsManager {
   }
 
   perTimeStep() {
-    this.ui.updateTimeStep(this.trailManager.timeStep);
+    this.ui.updateTimeStep(this.trailManager);
   }
 
   perEpoch() {
-    this.ui.updateEpoch(this.trailManager.epoch);
+    this.ui.updateEpoch(this.trailManager);
   }
 
   perTrail() {
-    this.ui.updateTrail(this.trailManager.trail);
+    this.ui.updateTrail(this.trailManager);
   }
 
 }

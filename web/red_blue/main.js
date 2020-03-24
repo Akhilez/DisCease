@@ -13,7 +13,7 @@ let k_neighbours = 4;    // This is k
 // ------------ END Parameters -----------------
 
 function setup() {
-  let canvas = createCanvas(300, 300);
+  let canvas = createCanvas(600, 600);
   frameRate(60);
   canvas.parent('red-blue-sketch-holder');
 
@@ -29,7 +29,7 @@ function draw(){
 
   if (trailManager.isComplete()) {  // All trails are complete. End the game.
     // TODO: End the game.
-    background(254);
+    background(230);
     return;
   }
 

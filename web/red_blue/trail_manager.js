@@ -1,6 +1,6 @@
 class TrailManager {
   constructor(timeStepsPerEpoch, numEpochsPerTrail, numTrails) {
-    this.trail = 1;
+    this.trail = 0;
     this.epoch = 0;
     this.timeStep = 0;
     this.timeStepsPerEpoch = timeStepsPerEpoch;
