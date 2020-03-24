@@ -25,23 +25,24 @@ class StatsManager {
   }
 
   perTimeStep() {
-    this.currentEpoch.timeSteps.push(this.grid.getTotalHappiness());
-    this.ui.updateTimeStep(this.trailManager);
+    let happiness = this.grid.getTotalHappiness();
+    this.currentEpoch.timeSteps.push(happiness);
+    this.ui.updateTimeStep(this.trailManager, happiness);
   }
 
   perEpoch() {
     this.currentEpoch.number = this.trailManager.epoch;
     this.currentEpoch.totalHappiness = this.currentEpoch.timeSteps[this.currentEpoch.timeSteps.length-1];
     this.currentTrail.epochs.push(this.currentEpoch);
+    this.ui.updateEpoch(this.trailManager, this.currentEpoch);
     this.currentEpoch = {timeSteps: []};
-    this.ui.updateEpoch(this.trailManager);
   }
 
   perTrail() {
     this.currentTrail.totalHappiness = 0;  // TODO: Get the total happiness
     this.data.push(this.currentTrail);
     this.currentTrail = {epochs: []};
-    this.ui.updateTrail(this.trailManager);
+    this.ui.updateTrail(this.trailManager, this.currentTrail);
   }
 
 }
