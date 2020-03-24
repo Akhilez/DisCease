@@ -90,6 +90,15 @@ class Grid {
     return numSameNeighbours;
   }
 
+  getTotalHappiness () {
+    let happiness = 0;
+    for (let i = 0; i < this.nRows; i++)
+      for (let j=0; j<this.nRows; j++)
+        if (this.matrix[i][j] !== cellState.empty)
+          happiness += this.getHappyScore(i, j, this.matrix[i][j]);
+    return happiness;
+  }
+
   fillAgentsRandomly(size) {
     this.matrix = this.createMatrix(this.nRows);
 
