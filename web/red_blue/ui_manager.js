@@ -24,13 +24,13 @@ class UIManager {
     this.epochCount.width(`${trailManager.epoch / trailManager.numEpochsPerTrail * 100}%`);
 
     this.currentTimeStepChart = this.createChart();
-    this.currentTimeStepChart.options.title.text = `Trail: ${trailManager.trail}. Epoch: ${trailManager.epoch}`;
+    this.currentTimeStepChart.options.title.text = `TimeSteps v Happiness for Trail: ${trailManager.trail}, Epoch: ${trailManager.epoch}`;
 
-    this.currentEpochChart.data.datasets[0].data.push(currentEpoch.totalHappiness);
+    this.currentEpochChart.data.datasets[0].data.push(currentEpoch.avgHappiness);
     this.currentEpochChart.data.labels.push(trailManager.epoch);
     this.currentEpochChart.update();
 
-    this.addTableRow(trailManager.trail, trailManager.epoch, currentEpoch.totalHappiness);
+    this.addTableRow(trailManager.trail, trailManager.epoch, currentEpoch.avgHappiness);
 
   }
 
@@ -42,13 +42,13 @@ class UIManager {
     this.trailCount.width(`${trailManager.trail / trailManager.numTrails * 100}%`);
 
     this.currentEpochChart = this.createChart();
-    this.currentEpochChart.options.title.text = `Trail: ${trailManager.trail}`;
+    this.currentEpochChart.options.title.text = `Epochs vs Happiness (avg) for Trail: ${trailManager.trail}`;
 
-    this.currentTrailChart.data.datasets[0].data.push(currentTrail.totalHappiness);
+    this.currentTrailChart.data.datasets[0].data.push(currentTrail.avgHappiness);
     this.currentTrailChart.data.labels.push(trailManager.epoch);
     this.currentTrailChart.update();
 
-    this.addTableRow(trailManager.trail, '-', currentTrail.totalHappiness);
+    this.addTableRow(trailManager.trail, '-', currentTrail.avgHappiness);
 
   }
 

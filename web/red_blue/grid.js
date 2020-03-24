@@ -91,13 +91,16 @@ class Grid {
     return numSameNeighbours;
   }
 
-  getTotalHappiness () {
+  getAvgHappiness () {
     let happiness = 0;
+    let numAgents = 0;
     for (let i = 0; i < this.nRows; i++)
       for (let j=0; j<this.nRows; j++)
-        if (this.matrix[i][j] !== cellState.empty)
+        if (this.matrix[i][j] !== cellState.empty) {
           happiness += this.getHappyScore(i, j, this.matrix[i][j]);
-    return happiness;
+          numAgents++
+        }
+    return happiness / numAgents;
   }
 
   fillAgentsRandomly(size) {
@@ -133,7 +136,7 @@ class Grid {
         if (this.matrix[i][j] !== cellState.empty) {
           shuffledIndices.push([i, j]);
         }
-      } 
+      }
     }
 
     this.shuffle(shuffledIndices);
@@ -148,7 +151,7 @@ class Grid {
          friends = [];
          this.shuffle(shuffledIndices);
         }
-      } 
+      }
     }
   }
 

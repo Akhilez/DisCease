@@ -1,7 +1,7 @@
 class TrailManager {
   constructor(timeStepsPerEpoch, numEpochsPerTrail, numTrails) {
-    this.trail = 0;
-    this.epoch = 0;
+    this.trail = 1;
+    this.epoch = 1;
     this.timeStep = 0;
     this.timeStepsPerEpoch = timeStepsPerEpoch;
     this.numEpochsPerTrail = numEpochsPerTrail;
@@ -9,25 +9,25 @@ class TrailManager {
   }
 
   isNewEpoch() {
-    return this.timeStep === 0;
+    return this.timeStep === 1;
   }
 
   isNewTrail() {
-    return this.epoch === 0 && this.timeStep === 0;
+    return this.epoch === 1 && this.isNewEpoch();
   }
 
   isComplete() {
-    return this.trail >= this.numTrails;
+    return this.trail > this.numTrails;
   }
 
   update() {
     this.timeStep++;
-    if (this.timeStep >= this.timeStepsPerEpoch) { // New epoch starts
+    if (this.timeStep > this.timeStepsPerEpoch) { // New epoch starts
       this.epoch++;
-      this.timeStep = 0;
-      if (this.epoch >= this.numEpochsPerTrail && !this.isComplete()) {  // New trail starts
+      this.timeStep = 1;
+      if (this.epoch > this.numEpochsPerTrail && !this.isComplete()) {  // New trail starts
         this.trail++;
-        this.epoch = 0;
+        this.epoch = 1;
       }
     }
   }
