@@ -44,3 +44,29 @@ class RandomRelocator extends Relocator {
 
   }
 }
+
+class FriendRelocator extends Relocator {
+  constructor(numberOfFriends, p) {
+    super();
+    this.numberOfFriends = numberOfFriends;
+    this.p = p;
+  }
+
+  relocate(agent, grid) {
+    /*
+    1- decide who the n friends are
+    2- when the agent wants to move it informs its friends. 
+      a. if the friends have an empty spot around them, they tell it 
+      b. else it picks a spot randomly
+    3- 
+
+
+    */
+
+    let emptyCells = grid.getEmptyCells();
+    grid.shuffle(emptyCells);
+
+    let maxHappyLocation = [agent.x, agent.y];
+    let maxHappyScore =  grid.getHappyScore(agent.x, agent.y, agent.type);;
+  }
+}
