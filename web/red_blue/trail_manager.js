@@ -32,9 +32,4 @@ class TrailManager {
     }
   }
 
-  reset() {
-    this.trail = 1;
-    this.epoch = 0;
-    this.timeStep = 0;
-  }
 }

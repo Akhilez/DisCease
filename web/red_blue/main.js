@@ -28,10 +28,11 @@ function setup() {
 function draw(){
 
   if (trailManager.isComplete()) {  // All trails are complete. End the game.
-    // TODO: End the game.
     background(230);
     return;
   }
+
+  grid.update();
 
   trailManager.update();
   statsManager.perTimeStep();
@@ -41,13 +42,11 @@ function draw(){
   }
 
   if (trailManager.isNewTrail()) { // All epochs are complete, start new trail.
-    // TODO: Gather info of the trail.
-    grid.fillAgentsRandomly(numAgents);
     statsManager.perTrail();
+    grid.fillAgentsRandomly(numAgents);
   }
 
   background(244);
-  grid.update();
   grid.draw();
 }
 

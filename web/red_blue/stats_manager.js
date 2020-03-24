@@ -30,6 +30,7 @@ class StatsManager {
   }
 
   perEpoch() {
+    this.currentEpoch.number = this.trailManager.epoch;
     this.currentEpoch.totalHappiness = this.currentEpoch.timeSteps[this.currentEpoch.timeSteps.length-1];
     this.currentTrail.epochs.push(this.currentEpoch);
     this.currentEpoch = {timeSteps: []};
@@ -37,9 +38,8 @@ class StatsManager {
   }
 
   perTrail() {
-    this.currentTrail.totalHappiness = 0;
+    this.currentTrail.totalHappiness = 0;  // TODO: Get the total happiness
     this.data.push(this.currentTrail);
-    console.log(this.data);
     this.currentTrail = {epochs: []};
     this.ui.updateTrail(this.trailManager);
   }
