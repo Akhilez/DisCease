@@ -72,7 +72,7 @@ class UIManager {
 
     colTrail.innerHTML = trail;
     colEpoch.innerHTML = epoch;
-    colHappiness.innerHTML = happiness;
+    colHappiness.innerHTML = happiness.toFixed(2);;
   }
 
   initTrailsChart() {

@@ -17,6 +17,7 @@
     .barLabel {
       width: 50px;
     }
+
     .canvasWidth {
       width: 300px;
     }
@@ -28,11 +29,12 @@
 
 <!-- -------------------------------------------------------------- -->
 
-<div class="container">
+<div style="padding: 50px">
 
   <h1>Complex Systems Homework 2</h1>
 
   <div class="row">
+
     <div class="col-auto">
       <h3>Type 1: Random relocation</h3>
       <table class="canvasWidth">
@@ -58,7 +60,16 @@
         </tr>
       </table>
       <div id="red-blue-sketch-holder-random-policy"></div>
+      <table id="statsTable-random" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
     </div>
+
+
     <div class="col-auto">
       <h3>Type 2: Friends relocation</h3>
       <table class="canvasWidth">
@@ -84,7 +95,16 @@
         </tr>
       </table>
       <div id="red-blue-sketch-holder-friend-policy"></div>
+      <table id="statsTable-friend" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
     </div>
+
+
     <div class="col-auto">
       <h3>Type 3: Swap relocation</h3>
       <table class="canvasWidth">
@@ -110,7 +130,16 @@
         </tr>
       </table>
       <div id="red-blue-sketch-holder-swap-policy"></div>
+      <table id="statsTable-swap" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
     </div>
+
+
     <div class="col-auto">
       <h3>Type 4: Local relocation</h3>
       <table class="canvasWidth">
@@ -136,56 +165,21 @@
         </tr>
       </table>
       <div id="red-blue-sketch-holder-local-policy"></div>
+      <table id="statsTable-local" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
     </div>
+
   </div>
 
-  <div class="row">
-    <div class="col-auto">
-      <h3>Random Relocation</h3>
-      <table id="statsTable-random" class="table">
-        <tr>
-          <th>Trail</th>
-          <th>Epoch</th>
-          <th>Avg Happiness</th>
-        </tr>
-      </table>
-    </div>
-    <div class="col-auto">
-      <h3>Friend Relocation</h3>
-      <table id="statsTable-friend" class="table">
-        <tr>
-          <th>Trail</th>
-          <th>Epoch</th>
-          <th>Avg Happiness</th>
-        </tr>
-      </table>
-    </div>
-    <div class="col-auto">
-      <h3>Swap Relocation</h3>
-      <table id="statsTable-swap" class="table">
-        <tr>
-          <th>Trail</th>
-          <th>Epoch</th>
-          <th>Avg Happiness</th>
-        </tr>
-      </table>
-    </div>
-    <div class="col-auto">
-      <h3>Local Relocation</h3>
-      <table id="statsTable-local" class="table">
-        <tr>
-          <th>Trail</th>
-          <th>Epoch</th>
-          <th>Avg Happiness</th>
-        </tr>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div id="allChartsContainer" class="row"></div>
+  <div id="allChartsContainer" class="row" style="padding-top: 50px"></div>
 
 </div>
+
 
 <!-- -------------------------------------------------------------- -->
 
