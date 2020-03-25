@@ -35,7 +35,7 @@ class Grid {
   draw() {
     for (let i = 0; i < this.nRows; i++) {
       for (let j = 0; j < this.nRows; j++) {
-        let agentType = this.matrix[i][j];
+        let agentType = this.matrix[i][j].type;
 
         let cellColor;
         if (agentType === cellState.red)
@@ -57,7 +57,7 @@ class Grid {
       for (let i = 0; i < this.nRows; i++)
         for (let j = 0; j < this.nRows; j++)
           if (this.matrix[i][j] !== cellState.empty)
-            this.selectionIndices.push(new Agent(i, j, this.matrix[i][j], []));
+            this.selectionIndices.push(this.matrix[i][j]);
       this.shuffle(this.selectionIndices);
     }
     return this.selectionIndices.pop();
@@ -84,7 +84,7 @@ class Grid {
         if (j === this.nRows)
           newJ = 0;
 
-        if (this.matrix[newI][newJ] === agentType)
+        if (this.matrix[newI][newJ].type === agentType)
           numSameNeighbours++;
       }
 
@@ -97,7 +97,7 @@ class Grid {
     for (let i = 0; i < this.nRows; i++)
       for (let j=0; j<this.nRows; j++)
         if (this.matrix[i][j] !== cellState.empty) {
-          happiness += this.getHappyScore(i, j, this.matrix[i][j]);
+          happiness += this.getHappyScore(i, j, this.matrix[i][j].type);
           numAgents++
         }
     return happiness / numAgents;
@@ -117,53 +117,50 @@ class Grid {
     for (let i = 0; i < halfSize; i++) {
       let x = shuffledIndices[i][0];
       let y = shuffledIndices[i][1];
-      this.matrix[x][y] = cellState.blue;
+      this.matrix[x][y] = new Agent(x, y, cellState.blue);
     }
     for (let i = halfSize; i < size; i++) {
       let x = shuffledIndices[i][0];
       let y = shuffledIndices[i][1];
-      this.matrix[x][y] = cellState.red;
+      this.matrix[x][y] = new Agent(x, y, cellState.red);
     }
   }
 
-  setAgentFriends(n) {
+  setAgentFriends(numFriends) {
 
-    let friends = [];
     let shuffledIndices = [];
 
-    for (let i = 0; i < this.nRows; i++) {
-      for (let j = 0; j < this.nRows; j++) {
-        if (this.matrix[i][j] !== cellState.empty) {
+    for (let i = 0; i < this.nRows; i++)
+      for (let j = 0; j < this.nRows; j++)
+        if (this.matrix[i][j] !== cellState.empty)
           shuffledIndices.push([i, j]);
-        }
-      }
-    }
 
-    this.shuffle(shuffledIndices);
-
-    for (let i = 0; i < this.nRows; i++) {
-      for (let j = 0; j < this.nRows; j++) {
+    for (let i = 0; i < this.nRows; i++)
+      for (let j = 0; j < this.nRows; j++)
         if (this.matrix[i][j] !== cellState.empty) {
-          for (let k = 0; k < n; k++) {
-            friends.push(shuffledIndices[0][k]);
+          this.matrix[i][j].friends = [];
+          this.shuffle(shuffledIndices);
+          let numFriendsCheck = numFriends;
+          for (let k = 0; k < numFriendsCheck; k++) {
+            let randX = shuffledIndices[k][0];
+            let randY = shuffledIndices[k][1];
+
+            if (this.matrix[randX][randY] === cellState.empty) {
+              numFriendsCheck++;
+              continue;
+            }
+            this.matrix[i][j].friends.push(this.matrix[randX][randY]);
           }
-         //this.matrix[i][j].friends = friends; HOW DO I ACCESS FRIENDS
-         friends = [];
-         this.shuffle(shuffledIndices);
         }
-      }
-    }
+
   }
-
-
 
   getEmptyCells() {
     let emptyCells = [];
     for (let i = 0; i < this.nRows; i++)
       for (let j = 0; j < this.nRows; j++)
-        if (this.matrix[i][j] === cellState.empty) {
+        if (this.matrix[i][j] === cellState.empty)
           emptyCells.push([i, j]);
-        }
     return emptyCells;
   }
 

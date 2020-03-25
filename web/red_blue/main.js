@@ -10,6 +10,8 @@ let numAgents = Math.floor(numRows * numRows * 0.9);
 let maxCheck = numRows;  // This is q
 let k_neighbours = 4;    // This is k
 
+let numFriends = 5;      // This is n
+
 // ------------ END Parameters -----------------
 
 function setup() {
@@ -22,7 +24,7 @@ function setup() {
   statsManager = new StatsManager(grid, trailManager);
 
   grid.fillAgentsRandomly(numAgents);
-  grid.setAgentFriends(5);
+  grid.setAgentFriends(numFriends);
 
 }
 

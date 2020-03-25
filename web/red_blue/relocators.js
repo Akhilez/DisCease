@@ -1,5 +1,5 @@
 class Relocator {
-  relocate(agent, grid){}
+  relocate(agent, grid) {}
 }
 
 class RandomRelocator extends Relocator {
@@ -23,7 +23,7 @@ class RandomRelocator extends Relocator {
     grid.shuffle(emptyCells);
 
     let maxHappyLocation = [agent.x, agent.y];
-    let maxHappyScore =  grid.getHappyScore(agent.x, agent.y, agent.type);;
+    let maxHappyScore = grid.getHappyScore(agent.x, agent.y, agent.type);
 
     for (let i = 0; i < this.maxCheck; i++) {
       if (i >= emptyCells.length)
@@ -40,7 +40,9 @@ class RandomRelocator extends Relocator {
     }
 
     grid.matrix[agent.x][agent.y] = cellState.empty;
-    grid.matrix[maxHappyLocation[0]][maxHappyLocation[1]] = agent.type;
+    grid.matrix[maxHappyLocation[0]][maxHappyLocation[1]] = agent;
+    agent.x = maxHappyLocation[0];
+    agent.y = maxHappyLocation[1];
 
   }
 }
@@ -50,23 +52,36 @@ class FriendRelocator extends Relocator {
     super();
     this.numberOfFriends = numberOfFriends;
     this.p = p;
+
+    this.randomRelocator = new RandomRelocator(numberOfFriends);
   }
 
   relocate(agent, grid) {
     /*
     1- decide who the n friends are
-    2- when the agent wants to move it informs its friends. 
-      a. if the friends have an empty spot around them, they tell it 
+    2- when the agent wants to move it informs its friends.
+      a. if the friends have an empty spot (THAT IS SUITABLE - Must be a happy cell) around them, they tell it
       b. else it picks a spot randomly
-    3- 
-
-
+    3-
     */
 
-    let emptyCells = grid.getEmptyCells();
-    grid.shuffle(emptyCells);
+    let happyCells = [];
+    for (let friend of agent.friends) {
+      happyCells = happyCells.concat(grid.getNearbyHappyCells(friend.x, friend.y, this.p, agent.type));
+    }
 
-    let maxHappyLocation = [agent.x, agent.y];
-    let maxHappyScore =  grid.getHappyScore(agent.x, agent.y, agent.type);;
+    if (happyCells.length === 0)
+      return this.randomRelocator.relocate(agent, grid);
+
+    grid.shuffle(happyCells);
+
+    let happyX = happyCells[0][0];
+    let happyY = happyCells[0][1];
+
+    grid.matrix[agent.x][agent.y] = cellState.empty;
+    grid.matrix[happyX][happyY] = agent;
+    agent.x = happyX;
+    agent.y = happyY;
+
   }
 }

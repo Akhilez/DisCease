@@ -12,6 +12,8 @@ class UIManager {
     this.currentEpochChart = null;
     this.currentTrailChart = null;
 
+    this.enableTimeStepsGraphs = false;
+
     this.initTrailChart();
     this.initEpochChart();
     this.initTimeStepChart();
@@ -19,6 +21,8 @@ class UIManager {
   }
 
   updateTimeStep(happiness) {
+    if (!this.enableTimeStepsGraphs)
+      return;
     this.currentTimeStepChart.data.labels.push(this.trailManager.timeStep);
     this.currentTimeStepChart.data.datasets[0].data.push(happiness);
 
@@ -29,7 +33,8 @@ class UIManager {
     this.epochCount.html(`${this.trailManager.epoch} / ${this.trailManager.numEpochsPerTrail}`);
     this.epochCount.width(`${this.trailManager.epoch / this.trailManager.numEpochsPerTrail * 100}%`);
 
-    this.initTimeStepChart();
+    if (!this.enableTimeStepsGraphs)
+      this.initTimeStepChart();
 
     this.currentEpochChart.data.datasets[0].data.push(currentEpoch.avgHappiness);
     this.currentEpochChart.data.labels.push(this.trailManager.epoch);
@@ -69,8 +74,13 @@ class UIManager {
   }
 
   initTimeStepChart() {
+    if (!this.enableTimeStepsGraphs)
+      return;
     this.currentTimeStepChart = this.createChart();
     this.currentTimeStepChart.options.title.text = `TimeSteps v Happiness for Trail: ${this.trailManager.trail}, Epoch: ${this.trailManager.epoch}`;
+    if (this.trailManager.trail === 5 && this.trailManager.epoch === 5){
+      console.log("here");
+    }
   }
 
   initEpochChart() {
