@@ -86,7 +86,26 @@ class UIManager {
         title: {
           display: true,
           text: `Epoch vs Happiness for all trails. Relocator: "${this.relocator.name}"`
-        }
+        },
+        elements: {
+          line: {
+            tension: 0
+          }
+        },
+        scales: {
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Epochs'
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Happiness'
+            }
+          }],
+        },
       }
     };
     this.currentEpochChart = this.addChartToPage(chartConfig);
@@ -103,6 +122,20 @@ class UIManager {
         title: {
           display: true,
           text: `Trails vs Happiness. Relocator: "${this.relocator.name}"`
+        },
+        scales: {
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Trails'
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Happiness'
+            }
+          }],
         }
       }
     };
