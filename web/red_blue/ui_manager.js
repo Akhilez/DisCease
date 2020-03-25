@@ -43,7 +43,7 @@ class UIManager {
       avg /= this.stats.data.length;
       this.addTableRow("Average", '-', avg)
     } else {
-      this.currentEpochChart.data.datasets.push({label: `Trail ${this.trailManager.trail + 1}`, data: []});
+      this.currentEpochChart.data.datasets.push(this.getNewLineDataset());
       this.currentEpochChart.data.labels.push(this.trailManager.trail + 1);
       this.currentEpochChart.update();
     }
@@ -80,7 +80,7 @@ class UIManager {
       type: 'line',
       data: {
         labels: [1],
-        datasets: [{label: `Trail ${this.trailManager.trail}`, data: []}]
+        datasets: [this.getNewLineDataset()]
       },
       options: {
         title: {
@@ -97,7 +97,7 @@ class UIManager {
       type: 'bar',
       data: {
         labels: [],
-        datasets: [{data: []}]
+        datasets: [{label: 'Happiness', data: []}]
       },
       options: {
         title: {
@@ -107,6 +107,16 @@ class UIManager {
       }
     };
     this.currentTrailChart = this.addChartToPage(chartConfig);
+  }
+
+  getNewLineDataset(){
+    let colors = palette('tol', this.trailManager.numTrails).map((hex) => '#' + hex);
+    return {
+      label: `Trail ${this.trailManager.trail}`,
+      data: [],
+      fill: false,
+      borderColor: colors[this.trailManager.trail],
+    }
   }
 
   addChartToPage(chartConfig) {
