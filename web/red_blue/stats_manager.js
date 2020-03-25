@@ -1,8 +1,7 @@
 class StatsManager {
-  constructor(grid, trailManager) {
+  constructor(grid) {
     this.grid = grid;
-    this.trailManager = trailManager;
-    this.ui = new UIManager(trailManager);
+    this.ui = new UIManager(trailManager, this);
 
     this.currentTrail = {epochs: []};
     this.currentEpoch = {timeSteps: []};

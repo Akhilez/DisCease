@@ -8,12 +8,16 @@ class TrailManager {
     this.numTrails = numTrails; // Total number of time steps in an episode.
   }
 
-  isNewEpoch() {
+  isLastTimeStep() {
     return this.timeStep === this.timeStepsPerEpoch;
   }
 
-  isNewTrail() {
-    return this.epoch === this.numEpochsPerTrail && this.isNewEpoch();
+  isLastEpoch() {
+    return this.epoch === this.numEpochsPerTrail && this.isLastTimeStep();
+  }
+
+  isLastTrail() {
+    return this.trail === this.numTrails;
   }
 
   isComplete() {

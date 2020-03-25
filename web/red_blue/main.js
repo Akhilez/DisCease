@@ -21,7 +21,7 @@ function setup() {
 
   grid = new Grid(numRows, new RandomRelocator(maxCheck));
   trailManager = new TrailManager(numAgents, 5, 5);
-  statsManager = new StatsManager(grid, trailManager);
+  statsManager = new StatsManager(grid);
 
   grid.fillAgentsRandomly(numAgents);
   grid.setAgentFriends(numFriends);
@@ -40,11 +40,11 @@ function draw(){
   trailManager.update();
   statsManager.perTimeStep();
 
-  if (trailManager.isNewEpoch()){
+  if (trailManager.isLastTimeStep()){
     statsManager.perEpoch();
   }
 
-  if (trailManager.isNewTrail()) { // All epochs are complete, start new trail.
+  if (trailManager.isLastEpoch()) { // All epochs are complete, start new trail.
     statsManager.perTrail();
     grid.fillAgentsRandomly(numAgents);
   }

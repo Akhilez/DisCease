@@ -1,43 +1,30 @@
 class UIManager {
-  constructor(trailManager) {
+  constructor(trailManager, statsManager) {
 
     this.trailManager = trailManager;
+    this.stats = statsManager;
 
     this.epochCount = $("#epochBar");
     this.trailCount = $("#trailBar");
     this.allChartsRef = document.getElementById('allChartsContainer');
     this.statsTable = document.getElementById("statsTable");
 
-    this.currentTimeStepChart = null;
     this.currentEpochChart = null;
     this.currentTrailChart = null;
 
-    this.enableTimeStepsGraphs = false;
-
-    this.initTrailChart();
-    this.initEpochChart();
-    this.initTimeStepChart();
+    this.initAllTrailsChart();
+    this.initTrailsChart();
 
   }
 
-  updateTimeStep(happiness) {
-    if (!this.enableTimeStepsGraphs)
-      return;
-    this.currentTimeStepChart.data.labels.push(this.trailManager.timeStep);
-    this.currentTimeStepChart.data.datasets[0].data.push(happiness);
-
-    this.currentTimeStepChart.update();
-  }
+  updateTimeStep(happiness) {}
 
   updateEpoch(currentEpoch) {
     this.epochCount.html(`${this.trailManager.epoch} / ${this.trailManager.numEpochsPerTrail}`);
     this.epochCount.width(`${this.trailManager.epoch / this.trailManager.numEpochsPerTrail * 100}%`);
 
-    if (!this.enableTimeStepsGraphs)
-      this.initTimeStepChart();
-
-    this.currentEpochChart.data.datasets[0].data.push(currentEpoch.avgHappiness);
-    this.currentEpochChart.data.labels.push(this.trailManager.epoch);
+    let lastDataIndex = this.currentEpochChart.data.datasets.length - 1;
+    this.currentEpochChart.data.datasets[lastDataIndex].data.push(currentEpoch.avgHappiness);
     this.currentEpochChart.update();
 
     this.addTableRow(this.trailManager.trail, this.trailManager.epoch, currentEpoch.avgHappiness);
@@ -45,19 +32,33 @@ class UIManager {
   }
 
   updateTrail(currentTrail) {
-    if (this.trailManager.isComplete())
-      return;
 
     this.trailCount.html(`${this.trailManager.trail} / ${this.trailManager.numTrails}`);
     this.trailCount.width(`${this.trailManager.trail / this.trailManager.numTrails * 100}%`);
 
-    this.initEpochChart();
+    if (this.trailManager.isLastTrail()){
+      let avg = 0;
+      this.stats.data.forEach(data => {avg += data.avgHappiness});
+      avg /= this.stats.data.length;
+      this.addTableRow("Average", '-', avg)
+    } else {
+      this.currentEpochChart.data.datasets.push({label: `Trail ${this.trailManager.trail + 1}`, data: []});
+      this.currentEpochChart.data.labels.push(this.trailManager.trail + 1);
+      this.currentEpochChart.update();
+    }
 
     this.currentTrailChart.data.datasets[0].data.push(currentTrail.avgHappiness);
     this.currentTrailChart.data.labels.push(this.trailManager.trail);
     this.currentTrailChart.update();
 
     this.addTableRow(this.trailManager.trail, '-', currentTrail.avgHappiness);
+
+    if (this.trailManager.isLastTrail()){
+      let avg = 0;
+      this.stats.data.forEach(data => {avg += data.avgHappiness});
+      avg /= this.stats.data.length;
+      this.addTableRow("Average", '-', avg)
+    }
 
   }
 
@@ -73,60 +74,53 @@ class UIManager {
     colHappiness.innerHTML = happiness;
   }
 
-  initTimeStepChart() {
-    if (!this.enableTimeStepsGraphs)
-      return;
-    this.currentTimeStepChart = this.createChart();
-    this.currentTimeStepChart.options.title.text = `TimeSteps v Happiness for Trail: ${this.trailManager.trail}, Epoch: ${this.trailManager.epoch}`;
-    if (this.trailManager.trail === 5 && this.trailManager.epoch === 5){
-      console.log("here");
-    }
+  initTrailsChart() {
+    let chartConfig = {
+      type: 'line',
+      data: {
+        labels: [1],
+        datasets: [{label: `Trail ${this.trailManager.trail}`, data: []}]
+      },
+      options: {
+        title: {
+          display: true,
+          text: 'Epoch vs Happiness for all trails'
+        }
+      }
+    };
+    this.currentEpochChart = this.addChartToPage(chartConfig);
   }
 
-  initEpochChart() {
-    this.currentEpochChart = this.createChart();
-    this.currentEpochChart.options.title.text = `Epochs vs Happiness (avg) for Trail: ${this.trailManager.trail}`;
+  initAllTrailsChart() {
+    let chartConfig = {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{label: 'Epochs', data: []}]
+      },
+      options: {
+        title: {
+          display: true,
+          text: 'Trails vs Happiness'
+        }
+      }
+    };
+    this.currentTrailChart = this.addChartToPage(chartConfig);
   }
 
-  initTrailChart() {
-    this.currentTrailChart = this.createChart();
-    this.currentTrailChart.type = 'bar';
-    this.currentTrailChart.options.title.text = `Trails v Happiness`;
-    this.currentTrailChart.update();
-  }
-
-  createChart() {
+  addChartToPage(chartConfig) {
     let chartDiv = document.createElement('div');
     chartDiv.className = 'col-auto';
     chartDiv.style.width = '600px';
     chartDiv.style.height = '400px';
     let chartCanvas = document.createElement('canvas');
 
-    let timeStepChart = this.getNewChart(chartCanvas);
+    let timeStepChart = new Chart(chartCanvas, chartConfig);
 
     chartDiv.appendChild(chartCanvas);
     this.allChartsRef.appendChild(chartDiv);
 
     return timeStepChart;
-  }
-
-  getNewChart(canvasRef) {
-    return new Chart(canvasRef, {
-      type: 'line',
-      data: {
-        labels: [],  // Epochs [1, 2, 3, 4]
-        datasets: [{
-          label: 'Happiness',
-          data: [],  // Happiness
-        }]
-      },
-      options: {
-        title: {
-          display: true,
-          text: 'Title'
-        }
-      }
-    });
   }
 
 }
