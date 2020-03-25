@@ -96,7 +96,7 @@ class UIManager {
       type: 'bar',
       data: {
         labels: [],
-        datasets: [{label: 'Epochs', data: []}]
+        datasets: [{data: []}]
       },
       options: {
         title: {

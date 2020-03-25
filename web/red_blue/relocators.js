@@ -6,6 +6,7 @@ class RandomRelocator extends Relocator {
   constructor(maxCheck) {
     super();
     this.maxCheck = maxCheck; // This is q
+    this.name = "random";
   }
 
   relocate(agent, grid) {
@@ -50,6 +51,7 @@ class RandomRelocator extends Relocator {
 class FriendRelocator extends Relocator {
   constructor(numberOfFriends, p) {
     super();
+    this.name = 'friend';
     this.numberOfFriends = numberOfFriends;
     this.p = p;
 
@@ -96,6 +98,7 @@ class FriendRelocator extends Relocator {
 class UnhappySwapRelocator extends Relocator {
   constructor() {
     super();
+    this.name = 'swap'
   }
 
   relocate(agent, grid) {

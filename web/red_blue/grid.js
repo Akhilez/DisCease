@@ -32,20 +32,20 @@ class Grid {
     }
   }
 
-  draw() {
+  draw(sketch) {
     for (let i = 0; i < this.nRows; i++) {
       for (let j = 0; j < this.nRows; j++) {
         let agentType = this.matrix[i][j].type;
 
         let cellColor;
         if (agentType === cellState.red)
-          cellColor = color('red');
+          cellColor = sketch.color('red');
         else if (agentType === cellState.blue)
-          cellColor = color('blue');
-        else cellColor = color('white');
+          cellColor = sketch.color('blue');
+        else cellColor = sketch.color('white');
 
-        fill(cellColor);
-        square(i * this.cellSize, j * this.cellSize, this.cellSize);
+        sketch.fill(cellColor);
+        sketch.square(i * this.cellSize, j * this.cellSize, this.cellSize);
 
       }
     }

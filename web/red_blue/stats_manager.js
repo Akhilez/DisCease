@@ -1,5 +1,5 @@
 class StatsManager {
-  constructor(grid) {
+  constructor(grid, trailManager) {
     this.grid = grid;
     this.ui = new UIManager(trailManager, this);
 

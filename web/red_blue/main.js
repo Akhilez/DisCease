@@ -1,6 +1,4 @@
-let grid;
-let trailManager;
-let statsManager;
+width = 600;
 
 // ------------ Parameters ---------------------
 
@@ -14,63 +12,53 @@ let numFriends = 5;      // This is n
 
 // ------------ END Parameters -----------------
 
-function setup() {
-  let canvas = createCanvas(600, 600);
-  frameRate(60);
-  canvas.parent('red-blue-sketch-holder');
+class Game {
+  constructor (relocator) {
+    this.relocator = relocator;
+    this.grid = new Grid(numRows, relocator);
+    this.trailManager = new TrailManager(numAgents, 5, 5);
+    this.statsManager = new StatsManager(this.grid, this.trailManager);
+  }
+  run(){
+    new p5(( sketch ) => {
+      sketch.setup = () => this.setup(sketch);
+      sketch.draw = () => this.draw(sketch);
+    });
+  }
+  setup(sketch) {
+    let canvas = sketch.createCanvas(width, width);
+    sketch.frameRate(60);
+    canvas.parent(`red-blue-sketch-holder-${this.relocator.name}-policy`);
 
-  grid = new Grid(numRows, new RandomRelocator(maxCheck));
-  trailManager = new TrailManager(numAgents, 5, 5);
-  statsManager = new StatsManager(grid);
+    this.grid.fillAgentsRandomly(numAgents);
+    this.grid.setAgentFriends(numFriends);
+  }
+  draw(sketch){
 
-  grid.fillAgentsRandomly(numAgents);
-  grid.setAgentFriends(numFriends);
+    if (this.trailManager.isComplete()) {  // All trails are complete. End the game.
+      sketch.background(230);
+      return;
+    }
 
+    this.grid.update();
+
+    this.trailManager.update();
+    this.statsManager.perTimeStep();
+
+    if (this.trailManager.isLastTimeStep()){
+      this.statsManager.perEpoch();
+    }
+
+    if (this.trailManager.isLastEpoch()) { // All epochs are complete, start new trail.
+      this.statsManager.perTrail();
+      this.grid.fillAgentsRandomly(numAgents);
+    }
+
+    sketch.background(244);
+    this.grid.draw(sketch);
+  }
 }
 
-function draw(){
-
-  if (trailManager.isComplete()) {  // All trails are complete. End the game.
-    background(230);
-    return;
-  }
-
-  grid.update();
-
-  trailManager.update();
-  statsManager.perTimeStep();
-
-  if (trailManager.isLastTimeStep()){
-    statsManager.perEpoch();
-  }
-
-  if (trailManager.isLastEpoch()) { // All epochs are complete, start new trail.
-    statsManager.perTrail();
-    grid.fillAgentsRandomly(numAgents);
-  }
-
-  background(244);
-  grid.draw();
-}
-
-
-// This is instance mode
-/*
-const s = ( sketch ) => {
-
-  let x = 100;
-  let y = 100;
-
-  sketch.setup = () => {
-    sketch.createCanvas(200, 200);
-  };
-
-  sketch.draw = () => {
-    sketch.background(0);
-    sketch.fill(255);
-    sketch.rect(x,y,50,50);
-  };
-};
-
-let myp5 = new p5(s);
-*/
+$( document ).ready(function() {
+  new Game(new RandomRelocator(maxCheck)).run();
+});
