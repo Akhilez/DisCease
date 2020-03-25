@@ -156,7 +156,7 @@ class Grid {
   //returns all happy cells around a certain one
   getNearbyHappyCells(x, y, p, agentType) {
 
-    happyCells = [];
+    let happyCells = [];
     let edge = Math.floor(p/2);
 
     //setting vars to avoid out of bounds
@@ -180,7 +180,7 @@ class Grid {
   getHappyCell(x, y, agentType) {
     for (let i = 0; i < nRows; i++) {
       for(let j = 0; j < nRows; j++) {
-        if((agentType!== this.matrix[i][j])) && !this.isAgentHappy(i, j, this.matrix[i][j] && x != i && y != j) {
+        if((agentType!== this.matrix[i][j]) && !this.isAgentHappy(i, j, this.matrix[i][j] && x != i && y != j)) {
           return this.matrix[i][j];
         }
       }
