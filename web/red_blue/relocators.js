@@ -103,8 +103,8 @@ class UnhappySwapRelocator extends Relocator {
     for (let i = 0; i < grid.matrix.nRows; i++) {
       for (let j = 0; j < grid.matrix.nRows; j++) {
         if(!grid.isAgentHappy(i, j, grid.matrix[i][j])) {
-          newAgent = grid.getHappyCell(i, j, grid.matrix[i][j]);
-          oldAgent = grid.matrix[i][j];
+          let newAgent = grid.getHappyCell(i, j, grid.matrix[i][j]);
+          let oldAgent = grid.matrix[i][j];
           grid.matrix[i][j] = newAgent;
           grid.matrix[newAgent.x][newAgent.y] = oldAgent;
         }
