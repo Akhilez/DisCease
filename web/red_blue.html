@@ -15,11 +15,10 @@
 
   <style>
     .barLabel {
-      width: 100px;
+      width: 50px;
     }
-    .bar {}
-    #statsTable {
-      width: 600px;
+    .canvasWidth {
+      width: 300px;
     }
   </style>
 
@@ -33,46 +32,158 @@
 
   <h1>Complex Systems Homework 2</h1>
 
-  <table style="width: 600px;">
-
-    <tr>
-      <td class="barLabel">Epoch</td>
-      <td>
-        <div class="progress bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar"
-               aria-valuemin="0" aria-valuemax="100" style="width:0">
-          </div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td class="barLabel">Trail</td>
-      <td>
-        <div class="progress bar">
-          <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar"
-               aria-valuemin="0" aria-valuemax="100" style="width:0">
-          </div>
-        </div>
-      </td>
-    </tr>
-  </table>
-
   <div class="row">
-  <div id="red-blue-sketch-holder-random-policy" class="col-auto"></div>
-  <div id="red-blue-sketch-holder-friend-policy" class="col-auto"></div>
-  <div id="red-blue-sketch-holder-swap-policy" class="col-auto"></div>
-  <div id="red-blue-sketch-holder-local-policy" class="col-auto"></div>
+    <div class="col-auto">
+      <h3>Type 1: Random relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-random"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-random"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-random-policy"></div>
+    </div>
+    <div class="col-auto">
+      <h3>Type 2: Friends relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-friend"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-friend"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-friend-policy"></div>
+    </div>
+    <div class="col-auto">
+      <h3>Type 3: Swap relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-swap"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-swap"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-swap-policy"></div>
+    </div>
+    <div class="col-auto">
+      <h3>Type 4: Local relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-local"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-local"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-local-policy"></div>
+    </div>
   </div>
 
-  <table id="statsTable" class="table">
-    <tr>
-      <th>Trail</th>
-      <th>Epoch</th>
-      <th>Avg Happiness</th>
-    </tr>
-  </table>
+  <div class="row">
+    <div class="col-auto">
+      <h3>Random Relocation</h3>
+      <table id="statsTable-random" class="table">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Avg Happiness</th>
+        </tr>
+      </table>
+    </div>
+    <div class="col-auto">
+      <h3>Friend Relocation</h3>
+      <table id="statsTable-friend" class="table">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Avg Happiness</th>
+        </tr>
+      </table>
+    </div>
+    <div class="col-auto">
+      <h3>Swap Relocation</h3>
+      <table id="statsTable-swap" class="table">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Avg Happiness</th>
+        </tr>
+      </table>
+    </div>
+    <div class="col-auto">
+      <h3>Local Relocation</h3>
+      <table id="statsTable-local" class="table">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>Avg Happiness</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
 
-  <div id="allChartsContainer" class="row"></div>
+<div id="allChartsContainer" class="row"></div>
 
 </div>
 

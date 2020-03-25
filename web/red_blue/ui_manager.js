@@ -1,13 +1,14 @@
 class UIManager {
-  constructor(trailManager, statsManager) {
+  constructor(trailManager, statsManager, relocator) {
 
     this.trailManager = trailManager;
     this.stats = statsManager;
+    this.relocator = relocator;
 
-    this.epochCount = $("#epochBar");
-    this.trailCount = $("#trailBar");
+    this.epochCount = $(`#epochBar-${relocator.name}`);
+    this.trailCount = $(`#trailBar${relocator.name}`);
     this.allChartsRef = document.getElementById('allChartsContainer');
-    this.statsTable = document.getElementById("statsTable");
+    this.statsTable = document.getElementById(`statsTable-${relocator.name}`);
 
     this.currentEpochChart = null;
     this.currentTrailChart = null;
@@ -84,7 +85,7 @@ class UIManager {
       options: {
         title: {
           display: true,
-          text: 'Epoch vs Happiness for all trails'
+          text: `Epoch vs Happiness for all trails. Relocator: "${this.relocator.name}"`
         }
       }
     };
@@ -101,7 +102,7 @@ class UIManager {
       options: {
         title: {
           display: true,
-          text: 'Trails vs Happiness'
+          text: `Trails vs Happiness. Relocator: "${this.relocator.name}"`
         }
       }
     };

@@ -1,4 +1,4 @@
-width = 600;
+width = 300;
 
 // ------------ Parameters ---------------------
 
@@ -17,7 +17,7 @@ class Game {
     this.relocator = relocator;
     this.grid = new Grid(numRows, relocator);
     this.trailManager = new TrailManager(numAgents, 5, 5);
-    this.statsManager = new StatsManager(this.grid, this.trailManager);
+    this.statsManager = new StatsManager(this.grid, this.trailManager, relocator);
   }
   run(){
     new p5(( sketch ) => {
@@ -60,5 +60,19 @@ class Game {
 }
 
 $( document ).ready(function() {
-  new Game(new RandomRelocator(maxCheck)).run();
+  let relocator1 = new RandomRelocator(maxCheck);
+
+  let relocator2 = new RandomRelocator(maxCheck);
+  relocator2.name = 'friend';
+
+  let relocator3 = new RandomRelocator(maxCheck);
+  relocator3.name = 'swap';
+
+  let relocator4 = new RandomRelocator(maxCheck);
+  relocator4.name = 'local';
+
+  new Game(relocator1).run();
+  new Game(relocator2).run();
+  new Game(relocator3).run();
+  new Game(relocator4).run();
 });
