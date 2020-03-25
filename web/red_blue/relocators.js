@@ -65,6 +65,13 @@ class FriendRelocator extends Relocator {
     3-
     */
 
+    /*
+    ISSUES & TODO FOR JENNA:
+      1- this doesn't take into consideration that friends can be of the same type or of another type..
+      2- This doesn't check to see if around a happy friend there is a spot for this agent to go..
+
+    */
+
     let happyCells = [];
     for (let friend of agent.friends) {
       happyCells = happyCells.concat(grid.getNearbyHappyCells(friend.x, friend.y, this.p, agent.type));
@@ -83,5 +90,25 @@ class FriendRelocator extends Relocator {
     agent.x = happyX;
     agent.y = happyY;
 
+  }
+}
+
+class UnhappySwapRelocator extends Relocator {
+  constructor() {
+    super();
+  }
+
+  relocate(agent, grid) {
+    
+    for (let i = 0; i < grid.matrix.nRows; i++) {
+      for (let j = 0; j < grid.matrix.nRows; j++) {
+        if(!grid.isAgentHappy(i, j, grid.matrix[i][j])) {
+          newAgent = grid.getHappyCell(i, j, grid.matrix[i][j]);
+          oldAgent = grid.matrix[i][j];
+          grid.matrix[i][j] = newAgent;
+          grid.matrix[newAgent.x][newAgent.y] = oldAgent;
+        }
+      }
+    }
   }
 }

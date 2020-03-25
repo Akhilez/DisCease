@@ -152,8 +152,42 @@ class Grid {
             this.matrix[i][j].friends.push(this.matrix[randX][randY]);
           }
         }
-
   }
+  //returns all happy cells around a certain one
+  getNearbyHappyCells(x, y, p, agentType) {
+
+    happyCells = [];
+    let edge = Math.floor(p/2);
+
+    //setting vars to avoid out of bounds
+    let xMin = Math.max(0, x - edge);
+    let xMax = Math.min(nRows-1, x + edge);
+    let yMin = Math.max(0, y - edge);
+    let yMax = Math.min(nRows-1, y + edge);
+
+    for (let i = xMin; i <= xMax; i++) {
+      for (let j = yMin; j <= yMax; j++) {
+        if(this.isAgentHappy(i, j, this.matrix[i][j])) {
+          happyCells.push(this.matrix[i][j]);
+        }
+      }
+    }
+
+    return happyCells;
+  }
+
+  //returns first unhappy cell of opposite color found
+  getHappyCell(x, y, agentType) {
+    for (let i = 0; i < nRows; i++) {
+      for(let j = 0; j < nRows; j++) {
+        if((agentType!== this.matrix[i][j])) && !this.isAgentHappy(i, j, this.matrix[i][j] && x != i && y != j) {
+          return this.matrix[i][j];
+        }
+      }
+    }
+  }
+
+
 
   getEmptyCells() {
     let emptyCells = [];
