@@ -1,8 +1,7 @@
 class UIManager {
-  constructor(trailManager, statsManager, relocator) {
+  constructor(trailManager, relocator) {
 
     this.trailManager = trailManager;
-    this.stats = statsManager;
     this.relocator = relocator;
 
     this.epochCount = $(`#epochBar-${relocator.name}`);
@@ -37,12 +36,7 @@ class UIManager {
     this.trailCount.html(`${this.trailManager.trail} / ${this.trailManager.numTrails}`);
     this.trailCount.width(`${this.trailManager.trail / this.trailManager.numTrails * 100}%`);
 
-    if (this.trailManager.isLastTrail()){
-      let avg = 0;
-      this.stats.data.forEach(data => {avg += data.avgHappiness});
-      avg /= this.stats.data.length;
-      this.addTableRow("Average", '-', avg)
-    } else {
+    if (!this.trailManager.isLastTrail()){
       this.currentEpochChart.data.datasets.push(this.getNewLineDataset());
       this.currentEpochChart.data.labels.push(this.trailManager.trail + 1);
       this.currentEpochChart.update();
@@ -54,13 +48,10 @@ class UIManager {
 
     this.addTableRow(this.trailManager.trail, '-', currentTrail.avgHappiness);
 
-    if (this.trailManager.isLastTrail()){
-      let avg = 0;
-      this.stats.data.forEach(data => {avg += data.avgHappiness});
-      avg /= this.stats.data.length;
-      this.addTableRow("Average", '-', avg)
-    }
+  }
 
+  updateAtEnd(data){
+    this.addTableRow("Average", '-', data.avgHappiness)
   }
 
   addTableRow(trail, epoch, happiness) {
@@ -165,6 +156,56 @@ class UIManager {
     this.allChartsRef.appendChild(chartDiv);
 
     return timeStepChart;
+  }
+
+  static drawAllPoliciesGraph (games) {
+
+    let allAvg = [];
+    games.forEach(game => allAvg.push(game.statsManager.data.avgHappiness));
+
+    let labels = [];
+    games.forEach(game => labels.push(game.relocator.name));
+
+    let chartConfig = {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{label: 'Happiness', data: allAvg}]
+      },
+      options: {
+        title: {
+          display: true,
+          text: "Policies vs Happiness",
+        },
+        scales: {
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Policies'
+            }
+          }],
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Happiness'
+            }
+          }],
+        }
+      }
+    };
+
+    let chartDiv = document.createElement('div');
+    chartDiv.className = 'col-auto';
+    chartDiv.style.width = '600px';
+    chartDiv.style.height = '400px';
+    let chartCanvas = document.createElement('canvas');
+
+    let timeStepChart = new Chart(chartCanvas, chartConfig);
+
+    chartDiv.appendChild(chartCanvas);
+    let allChartsRef = document.getElementById('allChartsContainer');
+    allChartsRef.appendChild(chartDiv);
+
   }
 
 }

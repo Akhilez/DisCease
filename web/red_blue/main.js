@@ -13,18 +13,20 @@ let numFriends = 5;      // This is n
 // ------------ END Parameters -----------------
 
 class Game {
-  constructor (relocator) {
+  constructor(relocator) {
     this.relocator = relocator;
     this.grid = new Grid(numRows, relocator);
     this.trailManager = new TrailManager(numAgents, 5, 5);
     this.statsManager = new StatsManager(this.grid, this.trailManager, relocator);
   }
-  run(){
-    new p5(( sketch ) => {
+
+  run() {
+    new p5((sketch) => {
       sketch.setup = () => this.setup(sketch);
       sketch.draw = () => this.draw(sketch);
     });
   }
+
   setup(sketch) {
     let canvas = sketch.createCanvas(width, width);
     sketch.frameRate(60);
@@ -33,7 +35,8 @@ class Game {
     this.grid.fillAgentsRandomly(numAgents);
     this.grid.setAgentFriends(numFriends);
   }
-  draw(sketch){
+
+  draw(sketch) {
 
     if (this.trailManager.isComplete()) {  // All trails are complete. End the game.
       sketch.background(230);
@@ -45,7 +48,7 @@ class Game {
     this.trailManager.update();
     this.statsManager.perTimeStep();
 
-    if (this.trailManager.isLastTimeStep()){
+    if (this.trailManager.isLastTimeStep()) {
       this.statsManager.perEpoch();
     }
 
@@ -54,12 +57,16 @@ class Game {
       this.grid.fillAgentsRandomly(numAgents);
     }
 
+    if (this.trailManager.isComplete()) {
+      this.statsManager.atEnd();
+    }
+
     sketch.background(244);
     this.grid.draw(sketch);
   }
 }
 
-$( document ).ready(function() {
+$(document).ready(function () {
   let relocator1 = new RandomRelocator(maxCheck);
 
   let relocator2 = new RandomRelocator(maxCheck);
@@ -71,8 +78,21 @@ $( document ).ready(function() {
   let relocator4 = new RandomRelocator(maxCheck);
   relocator4.name = 'local';
 
-  new Game(relocator1).run();
-  new Game(relocator2).run();
-  new Game(relocator3).run();
-  new Game(relocator4).run();
+  let games = [
+    new Game(relocator1),
+    new Game(relocator2),
+    new Game(relocator3),
+    new Game(relocator4),
+  ];
+  games.forEach(game => game.run());
+
+  let addFinalGraph = function () {
+    if (games.every(game => game.statsManager.data.avgHappiness != null)) {
+      UIManager.drawAllPoliciesGraph(games);
+    } else {
+      setTimeout(addFinalGraph, 5000);  // wait 5000 milliseconds then recheck
+    }
+  };
+
+  addFinalGraph();
 });
