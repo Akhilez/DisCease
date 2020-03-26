@@ -2,6 +2,7 @@ class UIManager {
   constructor(game) {
     this.game = game;
 
+    this.timeStepCount = $(`#timeStepBar-${this.game.relocator.name}`);
     this.epochCount = $(`#epochBar-${this.game.relocator.name}`);
     this.trailCount = $(`#trailBar${this.game.relocator.name}`);
     this.allChartsRef = document.getElementById('allChartsContainer');
@@ -15,7 +16,10 @@ class UIManager {
 
   }
 
-  updateTimeStep(happiness) {}
+  updateTimeStep(happiness) {
+    this.timeStepCount.html(`${this.game.trailManager.timeStep} / ${this.game.trailManager.timeStepsPerEpoch}`);
+    this.timeStepCount.width(`${this.game.trailManager.timeStep / this.game.trailManager.timeStepsPerEpoch * 100}%`);
+  }
 
   updateEpoch(currentEpoch) {
     this.epochCount.html(`${this.game.trailManager.epoch} / ${this.game.trailManager.numEpochsPerTrail}`);
