@@ -4,6 +4,8 @@ width = 300;
 
 let numRows = 5;
 let numAgents = Math.floor(numRows * numRows * 0.9);
+let numTrails = 5;
+let numEpochs = 5;
 
 let maxCheck = numRows;  // This is q
 let k_neighbours = 4;    // This is k
@@ -13,11 +15,12 @@ let numFriends = 5;      // This is n
 // ------------ END Parameters -----------------
 
 class Game {
-  constructor(relocator) {
+  constructor(relocator, positioner) {
     this.relocator = relocator;
-    this.grid = new Grid(numRows, relocator);
-    this.trailManager = new TrailManager(numAgents, 5, 5);
-    this.statsManager = new StatsManager(this.grid, this.trailManager, relocator);
+    this.grid = new Grid(this, numRows, positioner);
+    this.trailManager = new TrailManager(numAgents, numEpochs, numTrails);
+    this.statsManager = new StatsManager(this);
+    this.ui = new UIManager(this);
   }
 
   run() {
@@ -78,11 +81,13 @@ $(document).ready(function () {
   let relocator4 = new RandomRelocator(maxCheck);
   relocator4.name = 'local';
 
+  let positioner = new Positioner(numRows, numTrails);
+
   let games = [
-    new Game(relocator1),
-    new Game(relocator2),
-    new Game(relocator3),
-    new Game(relocator4),
+    new Game(relocator1, positioner),
+    new Game(relocator2, positioner),
+    new Game(relocator3, positioner),
+    new Game(relocator4, positioner),
   ];
   games.forEach(game => game.run());
 

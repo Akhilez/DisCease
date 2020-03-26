@@ -14,13 +14,13 @@ class Agent {
 }
 
 class Grid {
-  constructor(nRows, relocator) {
+  constructor(game, nRows, positioner) {
+    this.game = game;
     this.nRows = nRows;
+    this.positioner = positioner;
 
     this.cellSize = width / this.nRows;
     this.matrix = this.createMatrix(this.nRows);
-
-    this.relocator = relocator;
 
     this.selectionIndices = [];
   }
@@ -28,7 +28,7 @@ class Grid {
   update() {
     let currentAgent = this.getNextAgent();
     if (!this.isAgentHappy(currentAgent.x, currentAgent.y, currentAgent.type)) {
-      this.relocator.relocate(currentAgent, this);
+      this.game.relocator.relocate(currentAgent, this);
     }
   }
 
@@ -58,7 +58,7 @@ class Grid {
         for (let j = 0; j < this.nRows; j++)
           if (this.matrix[i][j] !== cellState.empty)
             this.selectionIndices.push(this.matrix[i][j]);
-      this.shuffle(this.selectionIndices);
+      Grid.shuffle(this.selectionIndices);
     }
     return this.selectionIndices.pop();
   }
@@ -91,11 +91,11 @@ class Grid {
     return numSameNeighbours;
   }
 
-  getAvgHappiness () {
+  getAvgHappiness() {
     let happiness = 0;
     let numAgents = 0;
     for (let i = 0; i < this.nRows; i++)
-      for (let j=0; j<this.nRows; j++)
+      for (let j = 0; j < this.nRows; j++)
         if (this.matrix[i][j] !== cellState.empty) {
           happiness += this.getHappyScore(i, j, this.matrix[i][j].type);
           numAgents++
@@ -106,12 +106,7 @@ class Grid {
   fillAgentsRandomly(size) {
     this.matrix = this.createMatrix(this.nRows);
 
-    let shuffledIndices = [];
-
-    for (let i = 0; i < this.nRows; i++)
-      for (let j = 0; j < this.nRows; j++)
-        shuffledIndices.push([i, j]);
-    this.shuffle(shuffledIndices);
+    let shuffledIndices = this.positioner.getPositions(this.game.trailManager.trail - 1);
 
     let halfSize = Math.floor(size / 2);
     for (let i = 0; i < halfSize; i++) {
@@ -139,7 +134,7 @@ class Grid {
       for (let j = 0; j < this.nRows; j++)
         if (this.matrix[i][j] !== cellState.empty) {
           this.matrix[i][j].friends = [];
-          this.shuffle(shuffledIndices);
+          Grid.shuffle(shuffledIndices);
           let numFriendsCheck = numFriends;
           for (let k = 0; k < numFriendsCheck; k++) {
             let randX = shuffledIndices[k][0];
@@ -153,21 +148,22 @@ class Grid {
           }
         }
   }
+
   //returns all happy cells around a certain one
   getNearbyHappyCells(x, y, p, agentType) {
 
     let happyCells = [];
-    let edge = Math.floor(p/2);
+    let edge = Math.floor(p / 2);
 
     //setting vars to avoid out of bounds
     let xMin = Math.max(0, x - edge);
-    let xMax = Math.min(nRows-1, x + edge);
+    let xMax = Math.min(nRows - 1, x + edge);
     let yMin = Math.max(0, y - edge);
-    let yMax = Math.min(nRows-1, y + edge);
+    let yMax = Math.min(nRows - 1, y + edge);
 
     for (let i = xMin; i <= xMax; i++) {
       for (let j = yMin; j <= yMax; j++) {
-        if(this.isAgentHappy(i, j, this.matrix[i][j])) {
+        if (this.isAgentHappy(i, j, this.matrix[i][j])) {
           happyCells.push(this.matrix[i][j]);
         }
       }
@@ -179,14 +175,13 @@ class Grid {
   //returns first unhappy cell of opposite color found
   getHappyCell(x, y, agentType) {
     for (let i = 0; i < nRows; i++) {
-      for(let j = 0; j < nRows; j++) {
-        if((agentType!== this.matrix[i][j]) && !this.isAgentHappy(i, j, this.matrix[i][j] && x != i && y != j)) {
+      for (let j = 0; j < nRows; j++) {
+        if ((agentType !== this.matrix[i][j]) && !this.isAgentHappy(i, j, this.matrix[i][j] && x != i && y != j)) {
           return this.matrix[i][j];
         }
       }
     }
   }
-
 
 
   getEmptyCells() {
@@ -202,7 +197,7 @@ class Grid {
     return new Array(n).fill(cellState.empty).map((o, i) => new Array(n).fill(cellState.empty))
   }
 
-  shuffle(array) {
+  static shuffle(array) {
     // This code is taken from the site: https://gomakethings.com/how-to-shuffle-an-array-with-vanilla-js/
 
     let currentIndex = array.length;

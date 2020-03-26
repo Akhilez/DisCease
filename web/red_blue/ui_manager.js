@@ -1,13 +1,11 @@
 class UIManager {
-  constructor(trailManager, relocator) {
+  constructor(game) {
+    this.game = game;
 
-    this.trailManager = trailManager;
-    this.relocator = relocator;
-
-    this.epochCount = $(`#epochBar-${relocator.name}`);
-    this.trailCount = $(`#trailBar${relocator.name}`);
+    this.epochCount = $(`#epochBar-${this.game.relocator.name}`);
+    this.trailCount = $(`#trailBar${this.game.relocator.name}`);
     this.allChartsRef = document.getElementById('allChartsContainer');
-    this.statsTable = document.getElementById(`statsTable-${relocator.name}`);
+    this.statsTable = document.getElementById(`statsTable-${this.game.relocator.name}`);
 
     this.currentEpochChart = null;
     this.currentTrailChart = null;
@@ -20,33 +18,33 @@ class UIManager {
   updateTimeStep(happiness) {}
 
   updateEpoch(currentEpoch) {
-    this.epochCount.html(`${this.trailManager.epoch} / ${this.trailManager.numEpochsPerTrail}`);
-    this.epochCount.width(`${this.trailManager.epoch / this.trailManager.numEpochsPerTrail * 100}%`);
+    this.epochCount.html(`${this.game.trailManager.epoch} / ${this.game.trailManager.numEpochsPerTrail}`);
+    this.epochCount.width(`${this.game.trailManager.epoch / this.game.trailManager.numEpochsPerTrail * 100}%`);
 
     let lastDataIndex = this.currentEpochChart.data.datasets.length - 1;
     this.currentEpochChart.data.datasets[lastDataIndex].data.push(currentEpoch.avgHappiness);
     this.currentEpochChart.update();
 
-    this.addTableRow(this.trailManager.trail, this.trailManager.epoch, currentEpoch.avgHappiness);
+    this.addTableRow(this.game.trailManager.trail, this.game.trailManager.epoch, currentEpoch.avgHappiness);
 
   }
 
   updateTrail(currentTrail) {
 
-    this.trailCount.html(`${this.trailManager.trail} / ${this.trailManager.numTrails}`);
-    this.trailCount.width(`${this.trailManager.trail / this.trailManager.numTrails * 100}%`);
+    this.trailCount.html(`${this.game.trailManager.trail} / ${this.game.trailManager.numTrails}`);
+    this.trailCount.width(`${this.game.trailManager.trail / this.game.trailManager.numTrails * 100}%`);
 
-    if (!this.trailManager.isLastTrail()){
+    if (!this.game.trailManager.isLastTrail()){
       this.currentEpochChart.data.datasets.push(this.getNewLineDataset());
-      this.currentEpochChart.data.labels.push(this.trailManager.trail + 1);
+      this.currentEpochChart.data.labels.push(this.game.trailManager.trail + 1);
       this.currentEpochChart.update();
     }
 
     this.currentTrailChart.data.datasets[0].data.push(currentTrail.avgHappiness);
-    this.currentTrailChart.data.labels.push(this.trailManager.trail);
+    this.currentTrailChart.data.labels.push(this.game.trailManager.trail);
     this.currentTrailChart.update();
 
-    this.addTableRow(this.trailManager.trail, '-', currentTrail.avgHappiness);
+    this.addTableRow(this.game.trailManager.trail, '-', currentTrail.avgHappiness);
 
   }
 
@@ -63,7 +61,7 @@ class UIManager {
 
     colTrail.innerHTML = trail;
     colEpoch.innerHTML = epoch;
-    colHappiness.innerHTML = happiness.toFixed(2);;
+    colHappiness.innerHTML = happiness.toFixed(2);
   }
 
   initTrailsChart() {
@@ -76,7 +74,7 @@ class UIManager {
       options: {
         title: {
           display: true,
-          text: `Epoch vs Happiness for all trails. Relocator: "${this.relocator.name}"`
+          text: `Epoch vs Happiness for all trails. Relocator: "${this.game.relocator.name}"`
         },
         elements: {
           line: {
@@ -112,7 +110,7 @@ class UIManager {
       options: {
         title: {
           display: true,
-          text: `Trails vs Happiness. Relocator: "${this.relocator.name}"`
+          text: `Trails vs Happiness. Relocator: "${this.game.relocator.name}"`
         },
         scales: {
           yAxes: [{
@@ -134,12 +132,12 @@ class UIManager {
   }
 
   getNewLineDataset(){
-    let colors = palette('tol', this.trailManager.numTrails).map((hex) => '#' + hex);
+    let colors = palette('tol', this.game.trailManager.numTrails).map((hex) => '#' + hex);
     return {
-      label: `Trail ${this.trailManager.trail}`,
+      label: `Trail ${this.game.trailManager.trail}`,
       data: [],
       fill: false,
-      borderColor: colors[this.trailManager.trail],
+      borderColor: colors[this.game.trailManager.trail],
     }
   }
 

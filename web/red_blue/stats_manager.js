@@ -1,7 +1,6 @@
 class StatsManager {
-  constructor(grid, trailManager, relocator) {
-    this.grid = grid;
-    this.ui = new UIManager(trailManager, relocator);
+  constructor(game) {
+    this.game = game;
 
     this.currentTrail = {epochs: []};
     this.currentEpoch = {timeSteps: []};
@@ -28,9 +27,9 @@ class StatsManager {
   }
 
   perTimeStep() {
-    let happiness = this.grid.getAvgHappiness();
+    let happiness = this.game.grid.getAvgHappiness();
     this.currentEpoch.timeSteps.push(happiness);
-    this.ui.updateTimeStep(happiness);
+    this.game.ui.updateTimeStep(happiness);
   }
 
   perEpoch() {
@@ -41,7 +40,7 @@ class StatsManager {
     this.currentEpoch.avgHappiness /= this.currentEpoch.timeSteps.length;
 
     this.currentTrail.epochs.push(this.currentEpoch);
-    this.ui.updateEpoch(this.currentEpoch);
+    this.game.ui.updateEpoch(this.currentEpoch);
     this.currentEpoch = {timeSteps: []};
   }
 
@@ -52,7 +51,7 @@ class StatsManager {
     });
     this.currentTrail.avgHappiness /= this.currentTrail.epochs.length;
     this.data.trails.push(this.currentTrail);
-    this.ui.updateTrail(this.currentTrail);
+    this.game.ui.updateTrail(this.currentTrail);
     this.currentTrail = {epochs: []};
   }
 
@@ -61,7 +60,7 @@ class StatsManager {
     this.data.trails.forEach(data => {this.data.avgHappiness += data.avgHappiness});
     this.data.avgHappiness /= this.data.trails.length;
 
-    this.ui.updateAtEnd(this.data);
+    this.game.ui.updateAtEnd(this.data);
   }
 
 }

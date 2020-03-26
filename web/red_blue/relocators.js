@@ -21,7 +21,7 @@ class RandomRelocator extends Relocator {
      */
 
     let emptyCells = grid.getEmptyCells();
-    grid.shuffle(emptyCells);
+    Grid.shuffle(emptyCells);
 
     let maxHappyLocation = [agent.x, agent.y];
     let maxHappyScore = grid.getHappyScore(agent.x, agent.y, agent.type);
@@ -82,7 +82,7 @@ class FriendRelocator extends Relocator {
     if (happyCells.length === 0)
       return this.randomRelocator.relocate(agent, grid);
 
-    grid.shuffle(happyCells);
+    Grid.shuffle(happyCells);
 
     let happyX = happyCells[0][0];
     let happyY = happyCells[0][1];
