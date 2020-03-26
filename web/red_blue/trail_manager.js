@@ -24,6 +24,10 @@ class TrailManager {
     return this.trail > this.numTrails;
   }
 
+  isNewTrail() {
+    return this.epoch === 1 && this.trail === 1;
+  }
+
   update() {
     this.timeStep++;
     if (this.timeStep > this.timeStepsPerEpoch) { // New epoch starts

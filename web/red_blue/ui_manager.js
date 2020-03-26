@@ -133,11 +133,13 @@ class UIManager {
 
   getNewLineDataset(){
     let colors = palette('tol', this.game.trailManager.numTrails).map((hex) => '#' + hex);
+    let trail = this.game.trailManager.trail;
+    trail = (this.game.trailManager.isNewTrail())? trail - 1: trail;
     return {
-      label: `Trail ${this.game.trailManager.trail}`,
+      label: `Trail ${trail + 1}`,
       data: [],
       fill: false,
-      borderColor: colors[this.game.trailManager.trail],
+      borderColor: colors[trail],
     }
   }
 
