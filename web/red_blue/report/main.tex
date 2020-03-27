@@ -1,0 +1,72 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
+\usepackage{authblk}
+\usepackage{titling}
+\setlength{\droptitle}{-10em}   % This eliminates the space on top of title
+\usepackage[font=scriptsize]{caption}
+\usepackage{float}
+\usepackage{siunitx}
+
+%opening
+\title{Complex Systems And Networks\\Homwork 2}
+\author{Akhil Devarashetti\\Jenna Sawaf}
+\begin{document}
+  \maketitle
+
+  \begin{abstract}
+    abstract
+  \end{abstract}
+
+  \section{Title}
+  \subsection{System Description}
+  lorem ispudim
+  Your report will consist of two parts:
+  1. The first part will compare Policies 1 and 2. You will systematically vary the Policy 2 parameters,
+  n and p, over reasonable ranges. I suggest n = [5, 10, 20] and p = [3, 5], which will give you 6
+  cases. You can do more, but no less. For each case, you will run at least 30 simulations of at least
+  10 epochs each – keep the numbers the same for all cases – for both policies. You will then plot
+  the happiness time-series for all cases – the one Policy 1 case, and all the Policy 2 cases – on the
+  same plot, so if you tried 6 cases of Policy 2, you will have 7 time-series plots. You may also plot
+  anything else you think would be useful (e.g., each case separately against the Policy 1 case,
+  either as a time-series or a phase-plot). In the text for this part, you will briefly describe what you
+  did, what the results show, what they might mean, and your explanation. Use the plots to make
+  your points clearly. The entire report for this part should be no more than 2 pages, and preferably
+  just 1 page, including figures and text.
+  2. The second part of the report will be like the first part, but will consist of 1-page sections by each
+  group member (with names at the top of each page). Each individual’s page should compare their
+  Policy 3 with Policy 1. This is also where you will describe your Policy 3 and explain its logic.
+  Since the parameters of Policy 3 will be determined by your choice, you should decide how to
+  vary them to explore the space of possibilities in a systematic way. Again, you will plot the timeseries for Policy 1 and all the cases of your policy, as well as any other figures that help you
+  analyze the outcomes. Your text will follow the same guidelines as part 1, but each individual’s
+  part should be exactly 1 page including figures and text. Since the figures have to be clear, you
+  will have to come up with the best way to summarize your results.
+
+  \subsection{Title 2}
+  lorem ispudim
+
+  \begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.49\linewidth}
+      \includegraphics[width=\linewidth]{train_set_confusion_matrix.png}
+      \caption{Confusion matrix for train set}
+      \label{fig:1.1a}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\linewidth}
+      \includegraphics[width=\linewidth]{test_set_confusion_matrix.png}
+      \caption{Confusion matrix for test set}
+      \label{fig:1.1b}
+    \end{subfigure}
+    \caption{}
+  \end{figure}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{classification_error.png}
+    \caption{Error in classifying training samples for every 10th epoch}
+    \label{fig:1.2}
+  \end{figure}
+
+\end{document}
