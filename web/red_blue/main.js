@@ -78,8 +78,7 @@ $(document).ready(function () {
   let relocator3 = new RandomRelocator(maxCheck);
   relocator3.name = 'swap';
 
-  let relocator4 = new RandomRelocator(maxCheck);
-  relocator4.name = 'local';
+  let relocator4 = new LocalRelocator();
 
   let positioner = new Positioner(numRows, numTrails);
 
