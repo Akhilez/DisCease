@@ -29,7 +29,7 @@ class LocalRelocator extends Relocator {
 
       for (let i = startX; i <= startX + side; i++)
         for (let j = startY; j <= startY + side; j++)
-          if (this.isLocationInScope(i, j, grid) && grid.matrix[i][j].type === agent.type)
+          if (this.isLocationInScope(i, j, grid) && grid.matrix[i][j].type === agent.type) // && grid.isAgentHappy(i, j, agent.type))
             emptyCells = emptyCells.concat(this.getEmptyNeighbors(grid.matrix[i][j], grid));
 
       if (emptyCells.length > 0)

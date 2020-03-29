@@ -2,7 +2,7 @@ width = 300;
 
 // ------------ Parameters ---------------------
 
-let numRows = 5;
+let numRows = 15;
 let numAgents = Math.floor(numRows * numRows * 0.9);
 let numTrails = 5;
 let numEpochs = 5;
