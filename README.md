@@ -51,3 +51,8 @@ This topic is important because it will keep the general population informed on 
 
 [5] The PCA algorithm.
 
+# TODO:
+ - Go through the following resources:
+   - https://youtu.be/gxAaO2rsdIs
+   - https://twitter.com/harry_stevens/status/1238940084994523136?s=12
+   - https://www.whitehouse.gov/briefings-statements/call-action-tech-community-new-machine-readable-covid-19-dataset/?utm_source=link&utm_medium=header
