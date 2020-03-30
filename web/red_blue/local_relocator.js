@@ -52,7 +52,7 @@ class LocalRelocator extends Relocator {
     let emptyCells = [];
     for (let i = agent.x - 1; i <= agent.x + 1; i++)
       for (let j = agent.y - 1; j <= agent.y + 1; j++)
-        if (i !== j && this.isLocationInScope(i, j, grid))
+        if (this.isLocationInScope(i, j, grid) && (i !== agent.x || j !== agent.y))
           if (grid.matrix[i][j] === cellState.empty)
             emptyCells.push([i, j]);
     return emptyCells;
