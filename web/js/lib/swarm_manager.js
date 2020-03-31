@@ -1,11 +1,26 @@
 class SwarmManager {
-  constructor(numAgents = 10, mutation = 0.01, diseaseIntroductionRate = 0.001) {
+
+  constructor(game) {
+    this.game = game;
+    this.params = game.paramsInjector.params.swarmParams;
+    game.paramsInjector.register(this);
+
+    this.numAgents = null;
+    this.diseaseIntroductionRate = null;
+    this.forceOfAttraction = null;
+
+    this.updateParams();
+
     this.agents = [];
-    this.numAgents = numAgents;
-    this.diseaseIntroductionRate = diseaseIntroductionRate;
-    this.forceOfAttraction = 0.002;
+
     // TODO: Load the stored genes from JSON file at web/js/data/genes.json
     // TODO: Create all agents from the loaded genes.
+  }
+
+  updateParams() {
+    this.numAgents = this.params.numAgents;
+    this.diseaseIntroductionRate = this.params.diseaseIntroductionRate;
+    this.forceOfAttraction = this.params.forceOfAttraction;
   }
 
   initEpisode(diseaseProbability, deathRate, ImmunizationRate) {
@@ -15,15 +30,16 @@ class SwarmManager {
 
     // Add new agents into the mix
     for (let i = this.agents.length; i < this.numAgents; i++) {
-      let agent = new Agent(diseaseProbability, deathRate, ImmunizationRate);
+      let agent = new Agent(this.game, diseaseProbability, deathRate, ImmunizationRate);
       // TODO: Give the new agent genes from roulette wheel (high prob to best gene (best = max of agent.getScore()))
       // TODO: Perform a perturbation of this.mutation on the genes.
       this.agents.push(agent);
     }
 
     for (let i = 0; i < this.numAgents; i++) {
-      this.agents[i].location = createVector(random(10, width - 10), random(10, height - 10));
-      this.agents[i].acceleration = createVector(random(-width, width), random(-height, height));
+      let side = this.game.paramsInjector.params.uiParams.side;
+      this.agents[i].location = this.game.p5.createVector(this.game.p5.random(10, side - 10), this.game.p5.random(10, side - 10));
+      this.agents[i].acceleration = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side));
       this.agents[i].healthState = state.healthy;
     }
 
@@ -43,13 +59,13 @@ class SwarmManager {
     this.agents.forEach(agent => agent.applyForce(this.getGroupCenterVector(agent, groupCenters[agent.healthState])))
   }
 
-  displayAll() {
-    this.agents.forEach(agent => agent.display());
+  displayAll(sketch) {
+    this.agents.forEach(agent => agent.display(sketch));
   }
 
   introduceDisease(episodeManager) {
-    if (episodeManager.timeStep === 0 || random() <= this.diseaseIntroductionRate) {
-      let randomAgent = random(this.agents);
+    if (episodeManager.timeStep === 0 || this.game.p5.random() <= this.diseaseIntroductionRate) {
+      let randomAgent = this.game.p5.random(this.agents);
       if (randomAgent.healthState !== state.dead)
         randomAgent.healthState = state.diseased;
       else this.introduceDisease(episodeManager);
@@ -67,7 +83,8 @@ class SwarmManager {
   }
 
   getGroupCenter(group) {
-    return createVector(width / 2, height / 2); // This is a global center. Must be a group's center. group = agents of same health state
+    let side = this.game.paramsInjector.params.uiParams.side;
+    return this.game.p5.createVector( side / 2, side / 2); // This is a global center. Must be a group's center. group = agents of same health state
   }
 
   getGroupCenterVector(agent, center) {

@@ -1,77 +1,97 @@
-let swarmManager;
-let episodeManager;
-let fps = 60;
-let stats;
 let immunizationRateSlider;
 let deathRateSlider;
 let diseaseProbabilitySlider;
 
 
-
-function setup() {
-  var canvas = createCanvas(300, 300);
-  frameRate(fps);
-
-  // Move the canvas so it’s inside our <div id="sketch-holder">.
-  canvas.parent('sketch-holder');
-
-  diseaseProbabilitySlider = createSlider(0, 1000, 800);
-  deathRateSlider = createSlider(0, 1000, 5);
-  immunizationRateSlider = createSlider(0, 1000, 1);
-
-  immunizationRateSlider.changed(reset); 
-  deathRateSlider.changed(reset);
-  diseaseProbabilitySlider.changed(reset);
-
-  // diseaseProbabilitySlider.parent('hyper-parameters');
-
-  group = createDiv('');
-  group.position(30, 30);  
-  label = createSpan(' Disease Probability');
-  diseaseProbabilitySlider.parent(group);
-  label.parent(group);
-  group.parent('hyper-parameters');
-
-  group = createDiv('');
-  group.position(30, 60);  
-  label = createSpan(' Death Rate');
-  deathRateSlider.parent(group);
-  label.parent(group);
-  group.parent('hyper-parameters');
-
-  group = createDiv('');
-  group.position(30, 90);  
-  label = createSpan(' Immunization Rate');
-  immunizationRateSlider.parent(group);
-  label.parent(group);
-  group.parent('hyper-parameters');
-
-
-  episodeManager = new EpisodeManager(3, 300);
-  swarmManager = new SwarmManager(50, 0.1, 0.01);
-
-  stats = new Stats();
-}
-
-function draw() {
-
-  episodeManager.update();
-
-  if (episodeManager.isNewEpisode()) {
-    swarmManager.finishEpisode();
-    swarmManager.initEpisode(0.8, 0.05, 0.01);
+class Game {
+  constructor(){
+    this.paramsInjector = ParameterInjector.getInstance();
+    this.episodeManager = new EpisodeManager(this);
+    this.swarmManager = new SwarmManager(this);
+    this.uiManager = new UIManager(this);
+    this.stats = new Stats(this);
+    this.sketch = null;
+    this.p5 = null;
   }
-  
-  swarmManager.updateAll(episodeManager);
-  stats.update();
 
-  background(230);
-  swarmManager.displayAll();
+  run(){
+    this.p5 = new p5((sketch) => {
+      sketch.setup = () => this.setup(sketch);
+      sketch.draw = () => this.draw(sketch);
+    });
+  }
+
+  setup(sketch){
+    this.sketch = sketch;
+    this.uiManager.sketch = sketch;
+
+    this.uiManager.setupSketch();
+
+    // ----------------------------------------------
+
+    diseaseProbabilitySlider = sketch.createSlider(0, 1000, 800);
+    deathRateSlider = sketch.createSlider(0, 1000, 5);
+    immunizationRateSlider = sketch.createSlider(0, 1000, 1);
+
+    let self = this;
+    let resetter = function () {
+      self.episodeManager.reset();
+      self.swarmManager.reset(diseaseProbabilitySlider.value()/1000);
+      self.swarmManager.finishEpisode();
+      self.swarmManager.initEpisode(diseaseProbabilitySlider.value()/1000, deathRateSlider.value()/1000, immunizationRateSlider.value()/1000);
+    };
+
+    immunizationRateSlider.changed(resetter);
+    deathRateSlider.changed(resetter);
+    diseaseProbabilitySlider.changed(resetter);
+
+    // diseaseProbabilitySlider.parent('hyper-parameters');
+
+    let group;
+    let label;
+
+    group = sketch.createDiv('');
+    group.position(30, 30);
+    label = sketch.createSpan(' Disease Probability');
+    diseaseProbabilitySlider.parent(group);
+    label.parent(group);
+    group.parent('hyper-parameters');
+
+    group = sketch.createDiv('');
+    group.position(30, 60);
+    label = sketch.createSpan(' Death Rate');
+    deathRateSlider.parent(group);
+    label.parent(group);
+    group.parent('hyper-parameters');
+
+    group = sketch.createDiv('');
+    group.position(30, 90);
+    label = sketch.createSpan(' Immunization Rate');
+    immunizationRateSlider.parent(group);
+    label.parent(group);
+    group.parent('hyper-parameters');
+
+  }
+
+  draw(sketch){
+    this.episodeManager.update();
+
+    if (this.episodeManager.isNewEpisode()) {
+      this.swarmManager.finishEpisode();
+      this.swarmManager.initEpisode(0.8, 0.05, 0.01);
+    }
+
+    this.swarmManager.updateAll(this.episodeManager);
+    this.stats.update();
+
+    sketch.background(230);
+    this.swarmManager.displayAll(sketch);
+  }
 }
 
-function reset() {
-  episodeManager.reset();
-  swarmManager.reset(diseaseProbabilitySlider.value()/1000);
-  swarmManager.finishEpisode();
-  swarmManager.initEpisode(diseaseProbabilitySlider.value()/1000, deathRateSlider.value()/1000, immunizationRateSlider.value()/1000);
-}
+$(document).ready(function () {
+
+  new Game().run();
+
+});
+

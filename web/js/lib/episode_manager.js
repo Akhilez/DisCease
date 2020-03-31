@@ -1,10 +1,22 @@
 class EpisodeManager {
-  constructor(frames_per_time_step = 10, length = 60) {
-    this.episodeNumber = 1;
+  constructor(game) {
+    this.params = game.paramsInjector.params.episodeParams;
+    game.paramsInjector.register(this);
+
+    this.framesPerTimeStep = null;
+    this.timeStepsPerEpisode = null;
+
+    this.updateParams();
+
+    this.episode = 1;
     this.timeStep = 0;
-    this.frameNumber = 0;
-    this.frames_per_time_step = frames_per_time_step;
-    this.length = length; // Total number of time steps in an episode.
+    this.frame = 0;
+
+  }
+
+  updateParams(){
+    this.framesPerTimeStep = this.params.framesPerTimeStep;
+    this.timeStepsPerEpisode = this.params.timeStepsPerEpisode;
   }
 
   isNewEpisode() {
@@ -12,19 +24,20 @@ class EpisodeManager {
   }
 
   update() {
-    this.frameNumber++;
-    if (this.frameNumber % this.frames_per_time_step === 0) { // New time step starts
+    this.frame++;
+    if (this.frame % this.framesPerTimeStep === 0) { // New time step starts
       this.timeStep++;
-      if (this.timeStep >= this.length) {  // New episode starts
-        this.episodeNumber++;
+      if (this.timeStep >= this.timeStepsPerEpisode) {  // New episode starts
+        this.episode++;
         this.timeStep = 0;
-        this.frameNumber = 0;
+        this.frame = 0;
       }
     }
   }
+
   reset() {
-    this.episodeNumber = 1;
+    this.episode = 1;
     this.timeStep = 0;
-    this.frameNumber = 0.
+    this.frame = 0;
   }
 }

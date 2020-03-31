@@ -1,10 +1,10 @@
 class Stats {
-  constructor() {
-
+  constructor(game) {
+    this.game = game;
   }
 
   update() {
-    $("#message_p").html("Episode: " + episodeManager.episodeNumber);
+    $("#message_p").html("Episode: " + this.game.episodeManager.episode);
   }
 }
 

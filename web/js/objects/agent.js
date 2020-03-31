@@ -8,14 +8,16 @@ const state = {
 
 class Agent {
 
-  constructor (diseaseIdentificationProbability, deathRate, immunizationRate, deflections) {
+  constructor (game, diseaseIdentificationProbability, deathRate, immunizationRate, deflections) {
+    this.game = game;
     this.mass = 1;
     this.maxVelocity = 2;
     this.drag = 0.005;
 
-    this.location = createVector(random(10, width - 10), random(10, height - 10));
-    this.velocity = createVector(0.0, 0.0);
-    this.acceleration = createVector(random(-width, width), random(-height, height));
+    let side = this.game.paramsInjector.params.uiParams.side;
+    this.location = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side));
+    this.velocity = this.game.p5.createVector(0.0, 0.0);
+    this.acceleration = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side)); // p5.Vector(p5.random(-width, width), random(-height, height));
 
     // Hyper-parameters
     this.diseaseIdentificationProbability = diseaseIdentificationProbability; //*
@@ -64,10 +66,10 @@ class Agent {
     this._updateLocation();
   }
 
-  display() {
-    fill(color(this._getColor()));
-    stroke(200);
-    ellipse(this.location.x, this.location.y, 10, 10);
+  display(sketch) {
+    sketch.fill(sketch.color(this._getColor()));
+    sketch.stroke(200);
+    sketch.ellipse(this.location.x, this.location.y, 10, 10);
   }
 
   _updateLocation() {
@@ -81,15 +83,15 @@ class Agent {
   getNextMove(neighbours) {
 
     if (neighbours.length === 1)
-      return createVector(0, 0);
+      return this.game.p5.createVector(0, 0);
 
-    let nextMove = createVector(0, 0);
+    let nextMove = this.game.p5.createVector(0, 0);
 
     for (let neighbour of neighbours) {
-      nextMove = createVector(0.0, 0.0);
+      nextMove = this.game.p5.createVector(0.0, 0.0);
 
       let observedHealth = state.healthy;
-      if (random() <= this.diseaseIdentificationProbability)
+      if (this.game.p5.random() <= this.diseaseIdentificationProbability)
         observedHealth = neighbour.healthState;
 
       let pointer = p5.Vector.sub(neighbour.location, this.location);
@@ -103,15 +105,16 @@ class Agent {
   }
 
   checkBounds() {
+    let side = this.game.paramsInjector.params.uiParams.side;
     let padding = 5;
-    if (this.location.x > width - padding) {
+    if (this.location.x > side - padding) {
       this.velocity.x = -Math.abs(this.velocity.x);
       this.acceleration.x = 0;
     } else if (this.location.x < padding) {
       this.velocity.x = Math.abs(this.velocity.x);
       this.acceleration.x = 0;
     }
-    if (this.location.y > height - padding) {
+    if (this.location.y > side - padding) {
       this.velocity.y = -Math.abs(this.velocity.y);
       this.acceleration.y = 0;
     } else if (this.location.y < padding) {
@@ -140,7 +143,7 @@ class Agent {
 
   checkContaminated(neighbours) {
 
-    let px = random();
+    let px = this.game.p5.random();
 
     if (this.healthState === state.healthy) {
       if (px <= this.immunizationRate) {
