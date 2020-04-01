@@ -2,12 +2,12 @@ class SwarmManager {
 
   constructor(game) {
     this.game = game;
-    this.params = game.paramsInjector.params.swarmParams;
     game.paramsInjector.register(this);
 
     this.numAgents = null;
     this.diseaseIntroductionRate = null;
     this.forceOfAttraction = null;
+    this.contagionRate = null;
 
     this.updateParams();
 
@@ -18,9 +18,11 @@ class SwarmManager {
   }
 
   updateParams() {
-    this.numAgents = this.params.numAgents;
-    this.diseaseIntroductionRate = this.params.diseaseIntroductionRate;
-    this.forceOfAttraction = this.params.forceOfAttraction;
+    let params = this.game.paramsInjector.params.swarmParams;
+    this.numAgents = params.numAgents;
+    this.diseaseIntroductionRate = params.diseaseIntroductionRate;
+    this.forceOfAttraction = params.forceOfAttraction;
+    this.contagionRate = params.contagionRate;
   }
 
   initEpisode(diseaseProbability, deathRate, ImmunizationRate) {

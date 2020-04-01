@@ -10,6 +10,7 @@ class Agent {
 
   constructor (game, diseaseIdentificationProbability, deathRate, immunizationRate, deflections) {
     this.game = game;
+    this.swarm = game.swarmManager;
     this.mass = 1;
     this.maxVelocity = 2;
     this.drag = 0.005;
@@ -21,7 +22,6 @@ class Agent {
 
     // Hyper-parameters
     this.diseaseIdentificationProbability = diseaseIdentificationProbability; //*
-    this.contagionRate = 0.005;
     this.visualRange = 30;
     this.zombificationRate = 0.002;
     this.deathRate = deathRate; //*
@@ -38,7 +38,7 @@ class Agent {
     if (deflections != null)
       this.deflections = deflections;
     else
-      this.deflections = this.getPerfectDeflections();  // this.getRandomDeflections();
+      this.deflections = this.getRandomDeflections();
 
   }
 
@@ -190,7 +190,7 @@ class Agent {
 
     for (let neighbour of neighbours) {
       if (neighbour.healthState === state.diseased || neighbour.healthState === state.zombie) {
-        totalContagion += this.contagionRate;
+        totalContagion += this.swarm.contagionRate / 50;
       }
     }
 
@@ -223,7 +223,7 @@ class Agent {
   }
 
   getRandomSingleDeflection() {
-    return random(-0.1, 0.1);
+    return this.game.p5.random(-0.1, 0.1);
   }
 
   getRandomDeflections() {

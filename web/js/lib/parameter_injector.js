@@ -12,10 +12,17 @@ class ParameterInjector {
         mutation: 0.1,
         diseaseIntroductionRate: 0.01,
         forceOfAttraction: 0.002,
+        diseaseIdentificationProbability: 0,
+        contagionRate: 0,
+        visualRange: 0,
+        zombificationRate: 0,
+        deathRate: 0,
+        immunizationRate: 0,
+        immunizationLossRate: 0,
       },
       uiParams: {
         side: 300,
-        fps: 60,
+        fps: 24,
       },
     };
     this.clients = [];

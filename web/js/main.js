@@ -27,50 +27,6 @@ class Game {
 
     this.uiManager.setupSketch();
 
-    // ----------------------------------------------
-
-    diseaseProbabilitySlider = sketch.createSlider(0, 1000, 800);
-    deathRateSlider = sketch.createSlider(0, 1000, 5);
-    immunizationRateSlider = sketch.createSlider(0, 1000, 1);
-
-    let self = this;
-    let resetter = function () {
-      self.episodeManager.reset();
-      self.swarmManager.reset(diseaseProbabilitySlider.value()/1000);
-      self.swarmManager.finishEpisode();
-      self.swarmManager.initEpisode(diseaseProbabilitySlider.value()/1000, deathRateSlider.value()/1000, immunizationRateSlider.value()/1000);
-    };
-
-    immunizationRateSlider.changed(resetter);
-    deathRateSlider.changed(resetter);
-    diseaseProbabilitySlider.changed(resetter);
-
-    // diseaseProbabilitySlider.parent('hyper-parameters');
-
-    let group;
-    let label;
-
-    group = sketch.createDiv('');
-    group.position(30, 30);
-    label = sketch.createSpan(' Disease Probability');
-    diseaseProbabilitySlider.parent(group);
-    label.parent(group);
-    group.parent('hyper-parameters');
-
-    group = sketch.createDiv('');
-    group.position(30, 60);
-    label = sketch.createSpan(' Death Rate');
-    deathRateSlider.parent(group);
-    label.parent(group);
-    group.parent('hyper-parameters');
-
-    group = sketch.createDiv('');
-    group.position(30, 90);
-    label = sketch.createSpan(' Immunization Rate');
-    immunizationRateSlider.parent(group);
-    label.parent(group);
-    group.parent('hyper-parameters');
-
   }
 
   draw(sketch){
@@ -78,7 +34,7 @@ class Game {
 
     if (this.episodeManager.isNewEpisode()) {
       this.swarmManager.finishEpisode();
-      this.swarmManager.initEpisode(0.8, 0.05, 0.01);
+      this.swarmManager.initEpisode(0.8, 0.001, 0.0001);
     }
 
     this.swarmManager.updateAll(this.episodeManager);

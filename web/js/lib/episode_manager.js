@@ -1,6 +1,6 @@
 class EpisodeManager {
   constructor(game) {
-    this.params = game.paramsInjector.params.episodeParams;
+    this.game = game;
     game.paramsInjector.register(this);
 
     this.framesPerTimeStep = null;
@@ -9,18 +9,19 @@ class EpisodeManager {
     this.updateParams();
 
     this.episode = 1;
-    this.timeStep = 0;
+    this.timeStep = 1;
     this.frame = 0;
 
   }
 
-  updateParams(){
-    this.framesPerTimeStep = this.params.framesPerTimeStep;
-    this.timeStepsPerEpisode = this.params.timeStepsPerEpisode;
+  updateParams() {
+    let params = this.game.paramsInjector.params.swarmParams;
+    this.framesPerTimeStep = params.framesPerTimeStep;
+    this.timeStepsPerEpisode = params.timeStepsPerEpisode;
   }
 
   isNewEpisode() {
-    return this.timeStep === 0;
+    return this.timeStep === 1 && this.frame === 1;
   }
 
   update() {
@@ -29,7 +30,7 @@ class EpisodeManager {
       this.timeStep++;
       if (this.timeStep >= this.timeStepsPerEpisode) {  // New episode starts
         this.episode++;
-        this.timeStep = 0;
+        this.timeStep = 1;
         this.frame = 0;
       }
     }
@@ -37,7 +38,7 @@ class EpisodeManager {
 
   reset() {
     this.episode = 1;
-    this.timeStep = 0;
+    this.timeStep = 1;
     this.frame = 0;
   }
 }

@@ -30,16 +30,28 @@
 
   <h1>DisCease</h1>
 
-  <div class = "row" id="stats">
+  <div class="row" id="stats">
     <p id="message_p"></p>
   </div>
-  <div class = "row" id="sketch-and-params">
-  	<div class = "col-5" id="sketch-holder"></div>
-  	<div class = "col-5" id = "graph-and-stats"></div>
-
+  <div class="row" id="sketch-and-params">
+    <div class="col-5" id="sketch-holder"></div>
+    <div class="col-5" id="graph-and-stats"></div>
   </div>
-  <div class = "row">
-  	<div class = "col-4" id="hyper-parameters"></div>
+  <div class="row">
+    <div class="col-4" id="hyper-parameters">
+      <div>
+        <label for="contagionSlider">Contagion</label>
+        <input type="range" min="0.0" max="1.0" step="0.01" id="contagionSlider">
+      </div>
+      <div>
+        <label for="recoverySlider">Recovery</label>
+        <input type="range" min="0.0" max="1.0" step="0.01" id="recoverySlider">
+      </div>
+      <div>
+        <label for="deathSlider">Death</label>
+        <input type="range" min="0.0" max="1.0" step="0.01" id="deathSlider">
+      </div>
+    </div>
   </div>
 
 
