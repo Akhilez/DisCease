@@ -25,11 +25,14 @@ class LocalRelocator extends Relocator {
     let startX = agent.x - 1;
     let startY = agent.y - 1;
     let side = 3;
+
+    // let agentHappiness = grid.getHappyScore(agent.x, agent.y, agent.type);
+
     while (side <= grid.nRows) {
 
       for (let i = startX; i <= startX + side; i++)
         for (let j = startY; j <= startY + side; j++)
-          if (this.isLocationInScope(i, j, grid) && grid.matrix[i][j].type === agent.type) // && grid.isAgentHappy(i, j, agent.type))
+          if (this.isLocationInScope(i, j, grid) && grid.matrix[i][j].type === agent.type) //  && grid.getHappyScore(i, j, agent.type) >= agentHappiness) // && grid.isAgentHappy(i, j, agent.type))
             emptyCells = emptyCells.concat(this.getEmptyNeighbors(grid.matrix[i][j], grid));
 
       if (emptyCells.length > 0)
