@@ -102,15 +102,35 @@ class UnhappySwapRelocator extends Relocator {
 
   relocate(agent, grid) {
 
-    for (let i = 0; i < grid.matrix.nRows; i++) {
-      for (let j = 0; j < grid.matrix.nRows; j++) {
-        if(!grid.isAgentHappy(i, j, grid.matrix[i][j])) {
-          let newAgent = grid.getHappyCell(i, j, grid.matrix[i][j]);
-          let oldAgent = grid.matrix[i][j];
-          grid.matrix[i][j] = newAgent;
-          grid.matrix[newAgent.x][newAgent.y] = oldAgent;
-        }
-      }
-    }
+  	let unhappyCell = grid.getUnhappyHappyCell(agent.x, agent.y, agent.type);
+  	if(unhappyCell.length == 0) {
+  		alert();
+  		return
+  	}
+
+  	// grid.matrix[unhappyCell[0].x][unhappyCell[0].y].type = agent.type;
+  	// grid.matrix[agent.x][agent.y].type = grid.getOppositeState(agent.type);
+
+
+  	let agentX = agent.x;
+    let agentY = agent.y;
+    let agentType = agent.type;
+    let tempAgent = grid.matrix[agentX][agentY];
+
+
+    agent.type = unhappyCell[0].type;
+    console.log(grid.matrix[agentX][agentY.type]);
+    grid.matrix[agentX][agentY.type] = grid.getOppositeState(agent.type);
+    console.log(grid.matrix[agentX][agentY.type]);
+
+ //    console.log(grid.matrix[unhappyCell[0].x][unhappyCell[0].y].type);
+
+	
+	// console.log(grid.matrix[unhappyCell[0].x][unhappyCell[0].y].type);
+
+    // unhappyCell[0].x = agentX;
+    // unhappyCell[0].y = agentY;
+    // unhappyCell[0].type = agentType;
+
   }
 }
