@@ -2,7 +2,7 @@ width = 300;
 
 // ------------ Parameters ---------------------
 
-let numRows = 7;
+let numRows = 15;
 let numAgents = Math.floor(numRows * numRows * 0.9);
 let numTrails = 3;
 let numEpochs = 3;
@@ -11,6 +11,7 @@ let maxCheck = numRows;  // This is q
 let k_neighbours = 5;    // This is k
 
 let numFriends = 5;      // This is n
+let p = 7;
 
 // ------------ END Parameters -----------------
 
@@ -58,6 +59,7 @@ class Game {
     if (this.trailManager.isLastEpoch()) { // All epochs are complete, start new trail.
       this.statsManager.perTrail();
       this.grid.fillAgentsRandomly(numAgents);
+      this.grid.setAgentFriends(numFriends);
     }
 
     if (this.trailManager.isComplete()) {
@@ -72,11 +74,9 @@ class Game {
 $(document).ready(function () {
   let relocator1 = new RandomRelocator(maxCheck);
 
-  let relocator2 = new RandomRelocator(maxCheck);
-  relocator2.name = 'friend';
+  let relocator2 = new FriendRelocator(p);
 
-  let relocator3 = new RandomRelocator(maxCheck);
-  relocator3.name = 'swap';
+  let relocator3 = new UnhappySwapRelocator();
 
   let relocator4 = new LocalRelocator();
 

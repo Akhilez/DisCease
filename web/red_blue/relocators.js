@@ -49,13 +49,12 @@ class RandomRelocator extends Relocator {
 }
 
 class FriendRelocator extends Relocator {
-  constructor(numberOfFriends, p) {
+  constructor(p) {
     super();
     this.name = 'friend';
-    this.numberOfFriends = numberOfFriends;
     this.p = p;
 
-    this.randomRelocator = new RandomRelocator(numberOfFriends);
+    this.randomRelocator = new RandomRelocator(10);
   }
 
   relocate(agent, grid) {

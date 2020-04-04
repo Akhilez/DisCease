@@ -157,9 +157,9 @@ class Grid {
 
     //setting vars to avoid out of bounds
     let xMin = Math.max(0, x - edge);
-    let xMax = Math.min(nRows - 1, x + edge);
+    let xMax = Math.min(this.nRows - 1, x + edge);
     let yMin = Math.max(0, y - edge);
-    let yMax = Math.min(nRows - 1, y + edge);
+    let yMax = Math.min(this.nRows - 1, y + edge);
 
     for (let i = xMin; i <= xMax; i++) {
       for (let j = yMin; j <= yMax; j++) {
@@ -174,9 +174,9 @@ class Grid {
 
   //returns first unhappy cell of opposite color found
   getHappyCell(x, y, agentType) {
-    for (let i = 0; i < nRows; i++) {
-      for (let j = 0; j < nRows; j++) {
-        if ((agentType !== this.matrix[i][j]) && !this.isAgentHappy(i, j, this.matrix[i][j] && x != i && y != j)) {
+    for (let i = 0; i < this.nRows; i++) {
+      for (let j = 0; j < this.nRows; j++) {
+        if ((agentType !== this.matrix[i][j]) && !this.isAgentHappy(i, j, this.matrix[i][j]) && x !== i && y !== j) {
           return this.matrix[i][j];
         }
       }
