@@ -1,5 +1,6 @@
 class Relocator {
-  relocate(agent, grid) {}
+  relocate(agent, grid) {
+  }
 }
 
 class RandomRelocator extends Relocator {
@@ -63,14 +64,6 @@ class FriendRelocator extends Relocator {
     2- when the agent wants to move it informs its friends.
       a. if the friends have an empty spot (THAT IS SUITABLE - Must be a happy cell) around them, they tell it
       b. else it picks a spot randomly
-    3-
-    */
-
-    /*
-    ISSUES & TODO FOR JENNA:
-      1- this doesn't take into consideration that friends can be of the same type or of another type.. (Akhil: Wrong. It does take this into account. Check grid.setAgentFriends())
-      2- This doesn't check to see if around a happy friend there is a spot for this agent to go..
-
     */
 
     let happyCells = [];
@@ -102,35 +95,13 @@ class UnhappySwapRelocator extends Relocator {
 
   relocate(agent, grid) {
 
-  	let unhappyCell = grid.getUnhappyHappyCell(agent.x, agent.y, agent.type);
-  	if(unhappyCell.length == 0) {
-  		alert();
-  		return
-  	}
+    let unhappyCell = grid.getUnhappyHappyCell(agent.x, agent.y, agent.type);
+    if (unhappyCell.length === 0)
+      return;
 
-  	// grid.matrix[unhappyCell[0].x][unhappyCell[0].y].type = agent.type;
-  	// grid.matrix[agent.x][agent.y].type = grid.getOppositeState(agent.type);
-
-
-  	let agentX = agent.x;
-    let agentY = agent.y;
     let agentType = agent.type;
-    let tempAgent = grid.matrix[agentX][agentY];
-
-
     agent.type = unhappyCell[0].type;
-    console.log(grid.matrix[agentX][agentY.type]);
-    grid.matrix[agentX][agentY.type] = grid.getOppositeState(agent.type);
-    console.log(grid.matrix[agentX][agentY.type]);
-
- //    console.log(grid.matrix[unhappyCell[0].x][unhappyCell[0].y].type);
-
-	
-	// console.log(grid.matrix[unhappyCell[0].x][unhappyCell[0].y].type);
-
-    // unhappyCell[0].x = agentX;
-    // unhappyCell[0].y = agentY;
-    // unhappyCell[0].type = agentType;
+    unhappyCell[0].type = agentType;
 
   }
 }

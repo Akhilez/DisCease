@@ -177,22 +177,14 @@ class Grid {
   	let unhappyCell = [];
     for (let i = 0; i < this.nRows; i++) {
       for (let j = 0; j < this.nRows; j++) {
-        if ((agentType !== this.matrix[i][j].type) && !this.isAgentHappy(i, j, this.matrix[i][j])) {
-          unhappyCell.push(this.matrix[i][j]);
+        if ((agentType !== this.matrix[i][j].type) && (this.matrix[i][j] !== cellState.empty) && !this.isAgentHappy(i, j, this.matrix[i][j].type)) {
+          unhappyCell.push(this.matrix[i][j]); // This pushing is redundant if you are gonna return it anyway in the next step.
+          // Why don't you try to return a random unhappy agent instead of returning the sequentially first?
           return unhappyCell;
-
         }
       }
     }
   }
-
-  getOppositeState(agentType) {
-  	if (agentType === cellState.red)
-        return cellState.blue;
-    else if (agentType === cellState.blue)
-        return cellState.red;
-  }
-
 
   getEmptyCells() {
     let emptyCells = [];
