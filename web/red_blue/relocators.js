@@ -100,8 +100,8 @@ class UnhappySwapRelocator extends Relocator {
       return;
 
     let agentType = agent.type;
-    agent.type = unhappyCell[0].type;
-    unhappyCell[0].type = agentType;
+    agent.type = unhappyCell.type;
+    unhappyCell.type = agentType;
 
   }
 }
