@@ -174,11 +174,11 @@ class Grid {
 
   //returns first unhappy cell of opposite color found
   getUnhappyHappyCell(x, y, agentType) {
-  	let unhappyCell = [];
+    let unhappyCell = [];
     for (let i = 0; i < this.nRows; i++) {
       for (let j = 0; j < this.nRows; j++) {
         if ((agentType !== this.matrix[i][j].type) && (this.matrix[i][j] !== cellState.empty) && !this.isAgentHappy(i, j, this.matrix[i][j].type)) {
-          if(this.matrix[i][j] === null) 
+          if (this.matrix[i][j] === null)
             return;
           return this.matrix[i][j];
         }

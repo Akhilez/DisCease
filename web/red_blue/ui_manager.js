@@ -38,7 +38,7 @@ class UIManager {
     this.trailCount.html(`${this.game.trailManager.trail} / ${this.game.trailManager.numTrails}`);
     this.trailCount.width(`${this.game.trailManager.trail / this.game.trailManager.numTrails * 100}%`);
 
-    if (!this.game.trailManager.isLastTrail()){
+    if (!this.game.trailManager.isLastTrail()) {
       this.currentEpochChart.data.datasets.push(this.getNewLineDataset());
       this.currentEpochChart.data.labels.push(this.game.trailManager.trail + 1);
       this.currentEpochChart.update();
@@ -52,7 +52,7 @@ class UIManager {
 
   }
 
-  updateAtEnd(data){
+  updateAtEnd(data) {
     this.addTableRow("Average", '-', data.avgHappiness)
   }
 
@@ -135,10 +135,10 @@ class UIManager {
     this.currentTrailChart = this.addChartToPage(chartConfig);
   }
 
-  getNewLineDataset(){
+  getNewLineDataset() {
     let colors = palette('tol', this.game.trailManager.numTrails).map((hex) => '#' + hex);
     let trail = this.game.trailManager.trail;
-    trail = (this.game.trailManager.isNewTrail())? trail - 1: trail;
+    trail = (this.game.trailManager.isNewTrail()) ? trail - 1 : trail;
     return {
       label: `Trail ${trail + 1}`,
       data: [],
@@ -162,7 +162,7 @@ class UIManager {
     return timeStepChart;
   }
 
-  static drawAllPoliciesGraph (games) {
+  static drawAllPoliciesGraph(games) {
 
     let allAvg = [];
     games.forEach(game => allAvg.push(game.statsManager.data.avgHappiness));
