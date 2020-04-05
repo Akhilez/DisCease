@@ -29,7 +29,7 @@ class UIManager {
     this.currentEpochChart.data.datasets[lastDataIndex].data.push(currentEpoch.avgHappiness);
     this.currentEpochChart.update();
 
-    this.addTableRow(this.game.trailManager.trail, this.game.trailManager.epoch, currentEpoch.avgHappiness);
+    this.addTableRow(this.game.trailManager.trail, this.game.trailManager.epoch, currentEpoch.numHappyAgents, currentEpoch.avgHappiness);
 
   }
 
@@ -48,24 +48,26 @@ class UIManager {
     this.currentTrailChart.data.labels.push(this.game.trailManager.trail);
     this.currentTrailChart.update();
 
-    this.addTableRow(this.game.trailManager.trail, '-', currentTrail.avgHappiness);
+    this.addTableRow(this.game.trailManager.trail, '-', currentTrail.numHappyAgents, currentTrail.avgHappiness);
 
   }
 
   updateAtEnd(data) {
-    this.addTableRow("Average", '-', data.avgHappiness)
+    this.addTableRow("Average", '-', data.avgNumHappyAgents, data.avgHappiness)
   }
 
-  addTableRow(trail, epoch, happiness) {
+  addTableRow(trail, epoch, avgSameNeighbours, happiness) {
     let row = this.statsTable.insertRow();
 
     let colTrail = row.insertCell(0);
     let colEpoch = row.insertCell(1);
-    let colHappiness = row.insertCell(2);
+    let colAvgSameNeighbours = row.insertCell(2);
+    let colHappiness = row.insertCell(3);
 
     colTrail.innerHTML = trail;
     colEpoch.innerHTML = epoch;
-    colHappiness.innerHTML = happiness.toFixed(2);
+    colAvgSameNeighbours.innerHTML = avgSameNeighbours.toFixed(2);
+    colHappiness.innerHTML = happiness;
   }
 
   initTrailsChart() {
