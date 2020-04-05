@@ -66,8 +66,8 @@ class UIManager {
 
     colTrail.innerHTML = trail;
     colEpoch.innerHTML = epoch;
-    colAvgSameNeighbours.innerHTML = avgSameNeighbours.toFixed(2);
-    colHappiness.innerHTML = happiness;
+    colAvgSameNeighbours.innerHTML = avgSameNeighbours;
+    colHappiness.innerHTML = happiness.toFixed(2);
   }
 
   initTrailsChart() {
