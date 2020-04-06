@@ -138,7 +138,7 @@ class UIManager {
   }
 
   getNewLineDataset() {
-    let colors = palette('tol-sq', this.game.trailManager.numTrails).map((hex) => '#' + hex);
+    let colors = palette('all', this.game.trailManager.numTrails).map((hex) => '#' + hex);
     let trail = this.game.trailManager.trail;
     trail = (this.game.trailManager.isNewTrail()) ? trail - 1 : trail;
     return {
