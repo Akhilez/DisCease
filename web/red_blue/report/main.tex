@@ -37,45 +37,50 @@
   It is not evident that any one of either n or p had an influence on the results independently. Having a greater n alone did not give better results. The results correlate better with the global scope i.e. with both n and p.
   One possible explanation for these results would be that as we increase the global scope, the performance increases until the global scope reaches a sweet spot of 200 cells. This is understandable as the number of cells checked increases, the probability of finding cells that are happy increases. Beyond 200, the performance drops because with more number of cells in the global scope being distributed widely in the grid, the probability of forming a close group of agents decreases.
 
-  Based on the observations, I fixed the values of n and p as 25 and 3 respectively. Wen we compare the plots for Policy 1 and Policy 2, we see that the Policy 1 starts off better than Policy 2. This is because in the beginning of the simulation, the friends might not find as many happy cells as the random 100 cells in the Policy 1 would find. However, as the self-organization progresses, the probability of agent being happy at a random cell decreases because some empty cells are surrounded by more empty cells. With Policy 2 however, the empty cells picked are always nearby other cells. So, although Policy 1 appears to quickly self-organize, Policy 2 seems to perform better in the last few epochs before convergence.
+  Based on the observations, I fixed the values of n and p as 25 and 3 respectively. Wen we compare the plots for Policy 1 and Policy 2, we see that the Policy 1 starts off better than Policy 2. This is because in the beginning of the simulation, the friends might not find as many happy cells as the random 100 cells in the Policy 1 would find. However, as the self-organization progresses, the probability of agent being happy at a random cell decreases because some empty cells are surrounded by more empty cells. With Policy 2 however, the empty cells picked are always nearby other cells. So, although Policy 1 appears to quickly self-organize, Policy 2 seems to perform better in the last few epochs before convergence. We can see that Policy 2 outperforms Policy 1 in Figure \ref{fig:1.4.2} where the y axis is mean number of neighbors of same type over all agents.
 
 
   \newpage
   \subsection{Comparing Policy 3 and Policy 1- Jenna}
-  The policy that I created finds an unhappy agent, then from that searches for another unhappy agent of the opposite type and swaps them. The first agent is selected randomly, however the 2nd agent is selected by going through the matrix systematically. The relocation policy does not need any parameters, because for every unhappy agent it finds another one and they are swapped. While coming up with this policy i was inspired by bubble sort. But instead of doing it sequentially, the first agent is selected randomly.
+  The policy that I created finds an unhappy agent, then from that, searches for another unhappy agent of the opposite type and swaps them. The first agent is selected randomly, however the 2nd agent is selected by going through the matrix systematically. The relocation policy does not need any parameters, because for every unhappy agent it finds another one and they are swapped. While coming up with this policy I was inspired by bubble sort. But instead of doing it sequentially, the first agent is selected randomly.
 
-  The second part of the report will be like the first part, but will consist of 1-page sections by each
-  group member (with names at the top of each page). Each individual’s page should compare their
-  Policy 3 with Policy 1. This is also where you will describe your Policy 3 and explain its logic.
-  Since the parameters of Policy 3 will be determined by your choice, you should decide how to
-  vary them to explore the space of possibilities in a systematic way. Again, you will plot the time series for Policy 1 and all the cases of your policy, as well as any other figures that help you
-  analyze the outcomes. Your text will follow the same guidelines as part 1, but each individual’s
-  part should be exactly 1 page including figures and text. Since the figures have to be clear, you
-  will have to come up with the best way to summarize your results.
+  What differentiates this policy from the others, is that it swaps agents with each other. Because of this, unlike policy 1, the empty slots in the grid are left in the places they were initialized in and are not changed. This is clear when looking at the Figure \ref{fig:1.4.1} below which shows the final results of the grids. The swap Policy results in relatively large cluster formations, with random empty spots scattered throughout the graph.
+
+  The main issue with swapping agents with each other instead of moving them into empty places, is, when there are many empty slots scattered all over the place, making an agent happy may become more difficult, or impossible in some cases. If there are 2 empty slots next to each other, an agent will never be happy if placed next to this area, which will result in some noise within the clusters.
+
+  I believe that it is because of this noise, that the overall happiness score of each agent is not as high of those of the first 2 policies. As shown in Figure \ref{fig:1.4.2}, the average of happiness for the Swapping Policy is around 4.72, while the first and second policy range around 4.84 and 4.86 respectively. The swapping policy does well because overall large clusters are formed but as shown by the average happiness index, the noise added by not moving the empty cells around makes a difference.
+
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{policy4HappinessVEpochs.PNG}
+    \caption{Mean number of happy agents over epochs for all trails for Policy 3 \& 1.}
+    \label{fig:1.3}
+  \end{figure}
 
   \newpage
   \subsection{Comparing Policy 4 and Policy 1- Akhil}
-  I introduced a relocation policy where the unhappy agent would pick the nearest agent of the same type who has an empty spot around it and relocated to one of those surrounding empty cells randomly. It has no parameters. This relocation policy gives preference to local agents first which I think is more natural because a naive agent will first look into its surroundings and takes its position without looking for a global optimal location. We can observe this behaviour during the simulation. The empty cells appear to slide to a nearby location (which is actually an agent sliding into an empty cell, making it's current location an empty cell). This proves to be a bad solution compared to the policy 1. The easy explanation is that the agent doesn't consider whether the new location would make it happy or not. The only hope for an unhappy agent to become happy is that the probability of getting happier would increase if it relocates to a position around the agent of the same type. It doesn't take the happiness of the closest agent into consideration.
+  I introduced a relocation policy where the unhappy agent would pick the nearest agent of the same type who has an empty spot around it and relocate to one of those surrounding empty cells randomly. It has no parameters. This relocation policy gives preference to local agents first which I think is more natural because a naive agent will first look into its surroundings and takes its position without looking for a global optimal location. We can observe this behaviour during the simulation. The empty cells appear to slide to a nearby location (which is actually an agent sliding into an empty cell, making it's current location an empty cell). Since they tend to relocate locally, the clusters formed are small, we can see this in the Figure \ref{fig:1.4.1}. This proves to be a bad solution compared to the policy 1 as seen in the Figures \ref{fig:1.4.2} and \ref{fig:1.4.3}. The easy explanation is that the agent doesn't consider whether the new location would make it happy or not. The only hope for an unhappy agent to become happy is that the probability of getting happier would increase if it relocates to a position around the agent of the same type. It also doesn't take the happiness of the closest agent into consideration.
 
   \begin{figure}[ht]
     \centering
-    \begin{subfigure}[b]{0.49\linewidth}
-      \includegraphics[width=\linewidth]{socialPermutations.PNG}
-      \caption{Confusion matrix for train set}
-      \label{fig:1.1a}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\linewidth}
-      \includegraphics[width=\linewidth]{socialPermutations.PNG}
-      \caption{Confusion matrix for test set}
-      \label{fig:1.1b}
-    \end{subfigure}
-    \caption{}
+    \includegraphics[width=0.99\linewidth]{allVisuals.PNG}
+    \caption{A visualization of all relocation policies.}
+    \label{fig:1.4.1}
   \end{figure}
+
   \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.5\linewidth]{socialPermutations.PNG}
-    \caption{Error in classifying training samples for every 10th epoch}
-    \label{fig:1.2}
+    \begin{subfigure}[b]{0.59\linewidth}
+      \includegraphics[width=\linewidth]{allPolicies.PNG}
+      \caption{Mean number of neighbors of same type for all policies.}
+      \label{fig:1.4.2}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.40\linewidth}
+      \includegraphics[width=\linewidth]{policy4HappinessVEpochs.PNG}
+      \caption{Mean number of happy agents over epochs for all trails for Policy 4 \& 1.}
+      \label{fig:1.4.3}
+    \end{subfigure}
+    \caption{}
   \end{figure}
 
 \end{document}

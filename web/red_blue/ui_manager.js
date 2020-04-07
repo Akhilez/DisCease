@@ -4,7 +4,7 @@ class UIManager {
 
     this.timeStepCount = $(`#timeStepBar-${this.game.relocator.name}`);
     this.epochCount = $(`#epochBar-${this.game.relocator.name}`);
-    this.trailCount = $(`#trailBar${this.game.relocator.name}`);
+    this.trailCount = $(`#trailBar-${this.game.relocator.name}`);
     this.allChartsRef = document.getElementById('allChartsContainer');
     this.statsTable = document.getElementById(`statsTable-${this.game.relocator.name}`);
 
@@ -122,13 +122,13 @@ class UIManager {
           yAxes: [{
             scaleLabel: {
               display: true,
-              labelString: 'Trails'
+              labelString: 'Happiness'
             }
           }],
           xAxes: [{
             scaleLabel: {
               display: true,
-              labelString: 'Happiness'
+              labelString: 'Trails'
             }
           }],
         }
@@ -187,13 +187,13 @@ class UIManager {
           yAxes: [{
             scaleLabel: {
               display: true,
-              labelString: 'Policies'
+              labelString: 'Happiness'
             }
           }],
           xAxes: [{
             scaleLabel: {
               display: true,
-              labelString: 'Happiness'
+              labelString: 'Policies'
             }
           }],
         }

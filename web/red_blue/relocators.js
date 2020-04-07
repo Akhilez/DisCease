@@ -96,8 +96,7 @@ class UnhappySwapRelocator extends Relocator {
   relocate(agent, grid) {
 
     let unhappyCell = grid.getUnhappyHappyCell(agent.x, agent.y, agent.type);
-    if (unhappyCell.length === 0)
-      return;
+    if (unhappyCell == null) return;
 
     let agentType = agent.type;
     agent.type = unhappyCell.type;

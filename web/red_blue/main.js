@@ -4,7 +4,7 @@ width = 300;
 
 let numRows = 50;
 let numAgents = Math.floor(numRows * numRows * 0.9);
-let numTrails = 2;
+let numTrails = 1;
 let numEpochs = 15;
 
 let maxCheck = 100;  // This is q
