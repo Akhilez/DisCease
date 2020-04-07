@@ -1,24 +1,993 @@
+<!--
+
+Complex Systems and Networks Homework 2
+
+Group members:
+  - Akhil Devarashetti
+  - Jenna Sawaf
+
+To run the program, open this file using a web browser.
+For loading the js libraries, you'll need to run with an internet connection.
+
+All the parameters can be tuned in the parameters section below.
+
+The program will run the simulation for all relocation policies simultaneously and draws the graphs and tables.
+
+The relocation policies are implemented as extended classes of Relocator class.
+
+-->
+
 <!doctype html>
-
-<!------------------------------------------------------------------
-
-
-
-
--------------------------------------------------------------------->
-
-
 <html class="no-js" lang="">
 
 <head>
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
+
+  <!-- -------------------------------------------------------------- -->
+
+  <script>
+
+      width = 300;
+
+      // ------------ Parameters ---------------------
+
+      let numRows = 50;
+      let numAgents = Math.floor(numRows * numRows * 0.9);
+      let numTrails = 2;
+      let numEpochs = 15;
+
+      let maxCheck = 100;  // This is q
+      let k_neighbours = 4;    // This is k
+
+      let numFriends = 25;      // This is n  [5, 10, 20, 25]
+      let p = 3;  // [3, 5, 7]
+
+      // ------------ END Parameters -----------------
+
+      class Game {
+          constructor(relocator, positioner) {
+              this.relocator = relocator;
+              this.grid = new Grid(this, numRows, positioner);
+              this.trailManager = new TrailManager(numAgents, numEpochs, numTrails);
+              this.statsManager = new StatsManager(this);
+              this.ui = new UIManager(this);
+          }
+
+          run() {
+              new p5((sketch) => {
+                  sketch.setup = () => this.setup(sketch);
+                  sketch.draw = () => this.draw(sketch);
+              });
+          }
+
+          setup(sketch) {
+              let canvas = sketch.createCanvas(width, width);
+              sketch.frameRate(250);
+              canvas.parent(`red-blue-sketch-holder-${this.relocator.name}-policy`);
+
+              this.grid.fillAgentsRandomly(numAgents);
+              this.grid.setAgentFriends(numFriends);
+          }
+
+          draw(sketch) {
+
+              if (this.trailManager.isComplete()) {  // All trails are complete. End the game.
+                  sketch.background(230);
+                  return;
+              }
+
+              this.grid.update();
+
+              this.trailManager.update();
+              this.statsManager.perTimeStep();
+
+              if (this.trailManager.isLastTimeStep()) {
+                  this.statsManager.perEpoch();
+              }
+
+              if (this.trailManager.isLastEpoch()) { // All epochs are complete, start new trail.
+                  this.statsManager.perTrail();
+                  this.grid.fillAgentsRandomly(numAgents);
+                  this.grid.setAgentFriends(numFriends);
+              }
+
+              if (this.trailManager.isComplete()) {
+                  this.statsManager.atEnd();
+              }
+
+              sketch.background(244);
+              this.grid.draw(sketch);
+          }
+      }
+
+      $(document).ready(function () {
+          let relocator1 = new RandomRelocator(maxCheck);
+
+          let relocator2 = new FriendRelocator(p);
+
+          let relocator3 = new UnhappySwapRelocator();
+
+          let relocator4 = new LocalRelocator();
+
+          let positioner = new Positioner(numRows, numTrails);
+
+          let games = [
+              new Game(relocator1, positioner),
+              new Game(relocator2, positioner),
+              new Game(relocator3, positioner),
+              new Game(relocator4, positioner),
+          ];
+          games.forEach(game => game.run());
+
+          let addFinalGraph = function () {
+              if (games.every(game => game.statsManager.data.avgHappiness != null)) {
+                  UIManager.drawAllPoliciesGraph(games);
+              } else {
+                  setTimeout(addFinalGraph, 5000);  // wait 5000 milliseconds then recheck
+              }
+          };
+
+          addFinalGraph();
+      });
+
+
+      const cellState = {
+          empty: 0,
+          blue: -1,
+          red: 1,
+      };
+
+      class Agent {
+          constructor(x, y, value, friends) {
+              this.x = x;
+              this.y = y;
+              this.type = value;
+              this.friends = friends;
+          }
+      }
+
+      class Grid {
+          constructor(game, nRows, positioner) {
+              this.game = game;
+              this.nRows = nRows;
+              this.positioner = positioner;
+
+              this.cellSize = width / this.nRows;
+              this.matrix = this.createMatrix(this.nRows);
+
+              this.selectionIndices = [];
+          }
+
+          update() {
+              let currentAgent = this.getNextAgent();
+              if (!this.isAgentHappy(currentAgent.x, currentAgent.y, currentAgent.type)) {
+                  this.game.relocator.relocate(currentAgent, this);
+              }
+          }
+
+          draw(sketch) {
+              for (let i = 0; i < this.nRows; i++) {
+                  for (let j = 0; j < this.nRows; j++) {
+                      let agentType = this.matrix[i][j].type;
+
+                      let cellColor;
+                      if (agentType === cellState.red)
+                          cellColor = sketch.color('red');
+                      else if (agentType === cellState.blue)
+                          cellColor = sketch.color('blue');
+                      else cellColor = sketch.color('white');
+
+                      sketch.fill(cellColor);
+                      sketch.square(i * this.cellSize, j * this.cellSize, this.cellSize);
+
+                  }
+              }
+          }
+
+          getNextAgent() {
+              // Randomly pick an agent without replacement.
+              if (this.selectionIndices.length === 0) {
+                  for (let i = 0; i < this.nRows; i++)
+                      for (let j = 0; j < this.nRows; j++)
+                          if (this.matrix[i][j] !== cellState.empty)
+                              this.selectionIndices.push(this.matrix[i][j]);
+                  Grid.shuffle(this.selectionIndices);
+              }
+              return this.selectionIndices.pop();
+          }
+
+          isAgentHappy(x, y, agentType) {
+              return this.getHappyScore(x, y, agentType) >= k_neighbours;
+          }
+
+          getHappyScore(x, y, agentType) {
+              let numSameNeighbours = 0;
+              for (let i = x - 1; i <= x + 1; i = i + 1)
+                  for (let j = y - 1; j <= y + 1; j = j + 1) {
+                      if (i === x && j === y)
+                          continue;
+                      let newI = i;
+                      let newJ = j;
+                      if (i === -1)
+                          newI = this.nRows - 1;
+                      if (j === -1)
+                          newJ = this.nRows - 1;
+                      if (i === this.nRows)
+                          newI = 0;
+                      if (j === this.nRows)
+                          newJ = 0;
+
+                      if (this.matrix[newI][newJ].type === agentType)
+                          numSameNeighbours++;
+                  }
+
+              return numSameNeighbours;
+          }
+
+          getAvgHappiness() {
+              let happiness = 0;
+              let numAgents = 0;
+              for (let i = 0; i < this.nRows; i++)
+                  for (let j = 0; j < this.nRows; j++)
+                      if (this.matrix[i][j] !== cellState.empty) {
+                          happiness += this.getHappyScore(i, j, this.matrix[i][j].type);
+                          numAgents++
+                      }
+              return happiness / numAgents;
+          }
+
+          fillAgentsRandomly(size) {
+              this.matrix = this.createMatrix(this.nRows);
+
+              let shuffledIndices = this.positioner.getPositions(this.game.trailManager.trail - 1);
+
+              let halfSize = Math.floor(size / 2);
+              for (let i = 0; i < halfSize; i++) {
+                  let x = shuffledIndices[i][0];
+                  let y = shuffledIndices[i][1];
+                  this.matrix[x][y] = new Agent(x, y, cellState.blue);
+              }
+              for (let i = halfSize; i < size; i++) {
+                  let x = shuffledIndices[i][0];
+                  let y = shuffledIndices[i][1];
+                  this.matrix[x][y] = new Agent(x, y, cellState.red);
+              }
+          }
+
+          setAgentFriends(numFriends) {
+
+              let shuffledIndices = [];
+
+              for (let i = 0; i < this.nRows; i++)
+                  for (let j = 0; j < this.nRows; j++)
+                      if (this.matrix[i][j] !== cellState.empty)
+                          shuffledIndices.push([i, j]);
+
+              for (let i = 0; i < this.nRows; i++)
+                  for (let j = 0; j < this.nRows; j++)
+                      if (this.matrix[i][j] !== cellState.empty) {
+                          this.matrix[i][j].friends = [];
+                          Grid.shuffle(shuffledIndices);
+                          let numFriendsCheck = numFriends;
+                          for (let k = 0; k < numFriendsCheck; k++) {
+                              let randX = shuffledIndices[k][0];
+                              let randY = shuffledIndices[k][1];
+
+                              if (this.matrix[randX][randY] === cellState.empty) {
+                                  numFriendsCheck++;
+                                  continue;
+                              }
+                              this.matrix[i][j].friends.push(this.matrix[randX][randY]);
+                          }
+                      }
+          }
+
+          //returns all happy cells around a certain one
+          getNearbyHappyCells(x, y, p, agentType) {
+
+              let happyCells = [];
+              let edge = Math.floor(p / 2);
+
+              //setting vars to avoid out of bounds
+              let xMin = Math.max(0, x - edge);
+              let xMax = Math.min(this.nRows - 1, x + edge);
+              let yMin = Math.max(0, y - edge);
+              let yMax = Math.min(this.nRows - 1, y + edge);
+
+              for (let i = xMin; i <= xMax; i++) {
+                  for (let j = yMin; j <= yMax; j++) {
+                      if (this.isAgentHappy(i, j, this.matrix[i][j])) {
+                          happyCells.push(this.matrix[i][j]);
+                      }
+                  }
+              }
+
+              return happyCells;
+          }
+
+          //returns first unhappy cell of opposite color found
+          getUnhappyHappyCell(x, y, agentType) {
+              for (let i = 0; i < this.nRows; i++) {
+                  for (let j = 0; j < this.nRows; j++) {
+                      if ((agentType !== this.matrix[i][j].type) && (this.matrix[i][j] !== cellState.empty) && !this.isAgentHappy(i, j, this.matrix[i][j].type)) {
+                          if (this.matrix[i][j] === null)
+                              return;
+                          return this.matrix[i][j];
+                      }
+                  }
+              }
+          }
+
+          getEmptyCells() {
+              let emptyCells = [];
+              for (let i = 0; i < this.nRows; i++)
+                  for (let j = 0; j < this.nRows; j++)
+                      if (this.matrix[i][j] === cellState.empty)
+                          emptyCells.push([i, j]);
+              return emptyCells;
+          }
+
+          createMatrix(n) {
+              return new Array(n).fill(cellState.empty).map((o, i) => new Array(n).fill(cellState.empty))
+          }
+
+          static shuffle(array) {
+              // This code is taken from the site: https://gomakethings.com/how-to-shuffle-an-array-with-vanilla-js/
+
+              let currentIndex = array.length;
+              let temporaryValue, randomIndex;
+
+              // While there remain elements to shuffle...
+              while (0 !== currentIndex) {
+                  // Pick a remaining element...
+                  randomIndex = Math.floor(Math.random() * currentIndex);
+                  currentIndex -= 1;
+
+                  // And swap it with the current element.
+                  temporaryValue = array[currentIndex];
+                  array[currentIndex] = array[randomIndex];
+                  array[randomIndex] = temporaryValue;
+              }
+
+              return array;
+
+          }
+
+          getNumHappyAgents() {
+              let numHappyAGents = 0;
+              for (let i = 0; i < this.nRows; i++)
+                  for (let j = 0; j < this.nRows; j++)
+                      if ((this.matrix[i][j] !== cellState.empty) && this.isAgentHappy(i, j, this.matrix[i][j].type))
+                          numHappyAGents++;
+              return numHappyAGents;
+          }
+      }
+
+
+      class Relocator {
+          relocate(agent, grid) {
+          }
+      }
+
+      class RandomRelocator extends Relocator {
+          constructor(maxCheck) {
+              super();
+              this.maxCheck = maxCheck; // This is q
+              this.name = "random";
+          }
+
+          relocate(agent, grid) {
+              /*
+              1. Find all the empty cells.
+              2. Shuffle them.
+              3. Iterate this empty cells array from 0 to q.
+                 a. Keep track of happiest cell
+                 b. if happy, then select that cell.
+              4. If happiest is happier than current, then return happiest
+              5. Else return current location.
+               */
+
+              let emptyCells = grid.getEmptyCells();
+              Grid.shuffle(emptyCells);
+
+              let maxHappyLocation = [agent.x, agent.y];
+              let maxHappyScore = grid.getHappyScore(agent.x, agent.y, agent.type);
+
+              for (let i = 0; i < this.maxCheck; i++) {
+                  if (i >= emptyCells.length)
+                      break;
+                  let happyScore = grid.getHappyScore(emptyCells[i][0], emptyCells[i][1], agent.type);
+                  if (happyScore >= k_neighbours) {
+                      maxHappyLocation = emptyCells[i];
+                      break;
+                  }
+                  if (happyScore > maxHappyScore) {
+                      maxHappyScore = happyScore;
+                      maxHappyLocation = emptyCells[i];
+                  }
+              }
+
+              grid.matrix[agent.x][agent.y] = cellState.empty;
+              grid.matrix[maxHappyLocation[0]][maxHappyLocation[1]] = agent;
+              agent.x = maxHappyLocation[0];
+              agent.y = maxHappyLocation[1];
+
+          }
+      }
+
+      class FriendRelocator extends Relocator {
+          constructor(p) {
+              super();
+              this.name = 'friend';
+              this.p = p;
+
+              this.randomRelocator = new RandomRelocator(10);
+          }
+
+          relocate(agent, grid) {
+              /*
+              1- decide who the n friends are
+              2- when the agent wants to move it informs its friends.
+                a. if the friends have an empty spot (THAT IS SUITABLE - Must be a happy cell) around them, they tell it
+                b. else it picks a spot randomly
+              */
+
+              let happyCells = [];
+              for (let friend of agent.friends) {
+                  happyCells = happyCells.concat(grid.getNearbyHappyCells(friend.x, friend.y, this.p, agent.type));
+              }
+
+              if (happyCells.length === 0)
+                  return this.randomRelocator.relocate(agent, grid);
+
+              Grid.shuffle(happyCells);
+
+              let happyX = happyCells[0][0];
+              let happyY = happyCells[0][1];
+
+              grid.matrix[agent.x][agent.y] = cellState.empty;
+              grid.matrix[happyX][happyY] = agent;
+              agent.x = happyX;
+              agent.y = happyY;
+
+          }
+      }
+
+      class UnhappySwapRelocator extends Relocator {
+          constructor() {
+              super();
+              this.name = 'swap'
+          }
+
+          relocate(agent, grid) {
+
+              let unhappyCell = grid.getUnhappyHappyCell(agent.x, agent.y, agent.type);
+              if (unhappyCell == null) return;
+
+              let agentType = agent.type;
+              agent.type = unhappyCell.type;
+              unhappyCell.type = agentType;
+
+          }
+      }
+
+
+      class TrailManager {
+          constructor(timeStepsPerEpoch, numEpochsPerTrail, numTrails) {
+              this.trail = 1;
+              this.epoch = 1;
+              this.timeStep = 0;
+              this.timeStepsPerEpoch = timeStepsPerEpoch;
+              this.numEpochsPerTrail = numEpochsPerTrail;
+              this.numTrails = numTrails; // Total number of time steps in an episode.
+          }
+
+          isLastTimeStep() {
+              return this.timeStep === this.timeStepsPerEpoch;
+          }
+
+          isLastEpoch() {
+              return this.epoch === this.numEpochsPerTrail && this.isLastTimeStep();
+          }
+
+          isLastTrail() {
+              return this.trail === this.numTrails;
+          }
+
+          isComplete() {
+              return this.trail > this.numTrails;
+          }
+
+          isNewTrail() {
+              return this.epoch === 1 && this.trail === 1;
+          }
+
+          update() {
+              this.timeStep++;
+              if (this.timeStep > this.timeStepsPerEpoch) { // New epoch starts
+                  this.epoch++;
+                  this.timeStep = 1;
+                  if (this.epoch > this.numEpochsPerTrail && !this.isComplete()) {  // New trail starts
+                      this.trail++;
+                      this.epoch = 1;
+                  }
+              }
+          }
+
+      }
+
+
+      class StatsManager {
+          constructor(game) {
+              this.game = game;
+
+              this.currentTrail = {epochs: []};
+              this.currentEpoch = {timeSteps: []};
+              this.data = {trails: []};
+
+
+              // sample data:
+              let data = {
+                  avgHappiness: 0,
+                  avgNumHappyAgents: 10,
+                  trails: [
+                      {  // Trail 1
+                          epochs: [
+                              {
+                                  avgHappiness: 123,
+                                  timeSteps: [143, 122],
+                                  numHappyAgents: 10,
+                              }
+                          ],
+                          avgHappiness: 123,
+                          numHappyAgents: 10,
+                      }
+                  ],
+                  avgEpochs: [
+                      {
+                          epoch: 1,
+                          avgHappiness: 3.4,
+                          numHappyAgents: 2230,
+                          standardDeviation: 2.3,
+                      },
+                  ]
+              };
+
+
+          }
+
+          perTimeStep() {
+              let happiness = this.game.grid.getAvgHappiness();
+              this.currentEpoch.timeSteps.push(happiness);
+              this.game.ui.updateTimeStep(happiness);
+          }
+
+          perEpoch() {
+              this.currentEpoch.avgHappiness = 0;
+              this.currentEpoch.timeSteps.forEach(timeStepHappiness => {
+                  this.currentEpoch.avgHappiness += timeStepHappiness
+              });
+              this.currentEpoch.avgHappiness /= this.currentEpoch.timeSteps.length;
+
+              this.currentEpoch.numHappyAgents = this.game.grid.getNumHappyAgents();
+
+              this.currentTrail.epochs.push(this.currentEpoch);
+              this.game.ui.updateEpoch(this.currentEpoch);
+              this.currentEpoch = {timeSteps: []};
+
+          }
+
+          perTrail() {
+              this.currentTrail.avgHappiness = 0;
+              this.currentTrail.epochs.forEach(epoch => {
+                  this.currentTrail.avgHappiness += epoch.avgHappiness
+              });
+              this.currentTrail.avgHappiness /= this.currentTrail.epochs.length;
+
+              this.currentTrail.numHappyAgents = this.currentTrail.epochs[this.currentTrail.epochs.length - 1].numHappyAgents;
+
+              this.data.trails.push(this.currentTrail);
+              this.game.ui.updateTrail(this.currentTrail);
+              this.currentTrail = {epochs: []};
+          }
+
+          atEnd() {
+              this.data.avgHappiness = 0;
+              this.data.avgNumHappyAgents = 0;
+              this.data.trails.forEach(trail => {
+                  this.data.avgHappiness += trail.avgHappiness;
+                  this.data.avgNumHappyAgents += trail.numHappyAgents
+              });
+              this.data.avgHappiness /= this.data.trails.length;
+              this.data.avgNumHappyAgents /= this.data.trails.length;
+
+              this.setAverageEpochValues();
+
+              this.game.ui.updateAtEnd(this.data);
+          }
+
+          setAverageEpochValues() {
+
+              this.data.avgEpochs = [];
+              for (let epoch = 0; epoch < this.game.trailManager.numEpochsPerTrail; epoch++) {
+                  let epochData = {
+                      epoch: epoch + 1,
+                      avgHappiness: 0,
+                      numHappyAgents: 0,
+                  };
+                  let happyAgentNumbers = [];
+                  for (let trail = 0; trail < this.game.trailManager.numTrails; trail++) {
+                      let currentEpoch = this.data.trails[trail].epochs[epoch];
+                      epochData.avgHappiness += currentEpoch.avgHappiness;
+                      epochData.numHappyAgents += currentEpoch.numHappyAgents;
+                      happyAgentNumbers.push(currentEpoch.numHappyAgents);
+                  }
+                  epochData.standardDeviation = StatsManager.standardDeviation(happyAgentNumbers);
+                  epochData.avgHappiness /= this.game.trailManager.numTrails;
+                  epochData.numHappyAgents /= this.game.trailManager.numTrails;
+
+                  this.data.avgEpochs.push(epochData);
+              }
+          }
+
+
+          static standardDeviation(values) {
+              let avg = StatsManager.average(values);
+
+              let squareDiffs = values.map(function (value) {
+                  let diff = value - avg;
+                  return diff * diff;
+              });
+
+              let avgSquareDiff = StatsManager.average(squareDiffs);
+
+              return Math.sqrt(avgSquareDiff);
+          }
+
+          static average(data) {
+              let sum = data.reduce(function (sum, value) {
+                  return sum + value;
+              }, 0);
+
+              return sum / data.length;
+          }
+
+      }
+
+
+      class UIManager {
+          constructor(game) {
+              this.game = game;
+
+              this.timeStepCount = $(`#timeStepBar-${this.game.relocator.name}`);
+              this.epochCount = $(`#epochBar-${this.game.relocator.name}`);
+              this.trailCount = $(`#trailBar-${this.game.relocator.name}`);
+              this.allChartsRef = document.getElementById('allChartsContainer');
+              this.statsTable = document.getElementById(`statsTable-${this.game.relocator.name}`);
+
+              this.currentEpochChart = null;
+              this.currentTrailChart = null;
+
+              this.initAllTrailsChart();
+              this.initTrailsChart();
+
+          }
+
+          updateTimeStep(happiness) {
+              this.timeStepCount.html(`${this.game.trailManager.timeStep} / ${this.game.trailManager.timeStepsPerEpoch}`);
+              this.timeStepCount.width(`${this.game.trailManager.timeStep / this.game.trailManager.timeStepsPerEpoch * 100}%`);
+          }
+
+          updateEpoch(currentEpoch) {
+              this.epochCount.html(`${this.game.trailManager.epoch} / ${this.game.trailManager.numEpochsPerTrail}`);
+              this.epochCount.width(`${this.game.trailManager.epoch / this.game.trailManager.numEpochsPerTrail * 100}%`);
+
+              let lastDataIndex = this.currentEpochChart.data.datasets.length - 1;
+              this.currentEpochChart.data.datasets[lastDataIndex].data.push(currentEpoch.avgHappiness);
+              this.currentEpochChart.update();
+
+              this.addTableRow(this.game.trailManager.trail, this.game.trailManager.epoch, currentEpoch.numHappyAgents, currentEpoch.avgHappiness.toFixed(2));
+
+          }
+
+          updateTrail(currentTrail) {
+
+              this.trailCount.html(`${this.game.trailManager.trail} / ${this.game.trailManager.numTrails}`);
+              this.trailCount.width(`${this.game.trailManager.trail / this.game.trailManager.numTrails * 100}%`);
+
+              if (!this.game.trailManager.isLastTrail()) {
+                  this.currentEpochChart.data.datasets.push(this.getNewLineDataset());
+                  this.currentEpochChart.data.labels.push(this.game.trailManager.trail + 1);
+                  this.currentEpochChart.update();
+              }
+
+              this.currentTrailChart.data.datasets[0].data.push(currentTrail.avgHappiness);
+              this.currentTrailChart.data.labels.push(this.game.trailManager.trail);
+              this.currentTrailChart.update();
+
+              this.addTableRow(this.game.trailManager.trail, '-', currentTrail.numHappyAgents, currentTrail.avgHappiness.toFixed(2));
+
+          }
+
+          updateAtEnd(data) {
+              this.addTableRow("Average", '-', data.avgNumHappyAgents, data.avgHappiness.toFixed(2));
+              this.addTableRow("Trails", "Epochs", "#Happy", "StdDev");
+
+              for (let avgEpoch of data.avgEpochs) {
+                  this.addTableRow("All", avgEpoch.epoch, avgEpoch.numHappyAgents, avgEpoch.standardDeviation);
+              }
+          }
+
+          addTableRow(trail, epoch, avgSameNeighbours, happiness) {
+              let row = this.statsTable.insertRow();
+
+              let colTrail = row.insertCell(0);
+              let colEpoch = row.insertCell(1);
+              let colAvgSameNeighbours = row.insertCell(2);
+              let colHappiness = row.insertCell(3);
+
+              colTrail.innerHTML = trail;
+              colEpoch.innerHTML = epoch;
+              colAvgSameNeighbours.innerHTML = avgSameNeighbours;
+              colHappiness.innerHTML = happiness;
+          }
+
+          initTrailsChart() {
+              let chartConfig = {
+                  type: 'line',
+                  data: {
+                      labels: [1],
+                      datasets: [this.getNewLineDataset()]
+                  },
+                  options: {
+                      title: {
+                          display: true,
+                          text: `Epoch vs Happiness for all trails. Relocator: "${this.game.relocator.name}"`
+                      },
+                      elements: {
+                          line: {
+                              tension: 0
+                          }
+                      },
+                      scales: {
+                          yAxes: [{
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Epochs'
+                              }
+                          }],
+                          xAxes: [{
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Happiness'
+                              }
+                          }],
+                      },
+                  }
+              };
+              this.currentEpochChart = this.addChartToPage(chartConfig);
+          }
+
+          initAllTrailsChart() {
+              let chartConfig = {
+                  type: 'bar',
+                  data: {
+                      labels: [],
+                      datasets: [{label: 'Happiness', data: []}]
+                  },
+                  options: {
+                      title: {
+                          display: true,
+                          text: `Trails vs Happiness. Relocator: "${this.game.relocator.name}"`
+                      },
+                      scales: {
+                          yAxes: [{
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Happiness'
+                              }
+                          }],
+                          xAxes: [{
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Trails'
+                              }
+                          }],
+                      }
+                  }
+              };
+              this.currentTrailChart = this.addChartToPage(chartConfig);
+          }
+
+          getNewLineDataset() {
+              let colors = palette('all', this.game.trailManager.numTrails).map((hex) => '#' + hex);
+              let trail = this.game.trailManager.trail;
+              trail = (this.game.trailManager.isNewTrail()) ? trail - 1 : trail;
+              return {
+                  label: `Trail ${trail + 1}`,
+                  data: [],
+                  fill: false,
+                  borderColor: colors[trail],
+              }
+          }
+
+          addChartToPage(chartConfig) {
+              let chartDiv = document.createElement('div');
+              chartDiv.className = 'col-auto';
+              chartDiv.style.width = '600px';
+              chartDiv.style.height = '400px';
+              let chartCanvas = document.createElement('canvas');
+
+              let timeStepChart = new Chart(chartCanvas, chartConfig);
+
+              chartDiv.appendChild(chartCanvas);
+              this.allChartsRef.appendChild(chartDiv);
+
+              return timeStepChart;
+          }
+
+          static drawAllPoliciesGraph(games) {
+
+              let allAvg = [];
+              games.forEach(game => allAvg.push(game.statsManager.data.avgHappiness));
+
+              let labels = [];
+              games.forEach(game => labels.push(game.relocator.name));
+
+              let chartConfig = {
+                  type: 'bar',
+                  data: {
+                      labels: labels,
+                      datasets: [{label: 'Happiness', data: allAvg}]
+                  },
+                  options: {
+                      title: {
+                          display: true,
+                          text: "Policies vs Happiness",
+                      },
+                      scales: {
+                          yAxes: [{
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Happiness'
+                              }
+                          }],
+                          xAxes: [{
+                              scaleLabel: {
+                                  display: true,
+                                  labelString: 'Policies'
+                              }
+                          }],
+                      }
+                  }
+              };
+
+              let chartDiv = document.createElement('div');
+              chartDiv.className = 'col-auto';
+              chartDiv.style.width = '600px';
+              chartDiv.style.height = '400px';
+              let chartCanvas = document.createElement('canvas');
+
+              let timeStepChart = new Chart(chartCanvas, chartConfig);
+
+              chartDiv.appendChild(chartCanvas);
+              let allChartsRef = document.getElementById('allChartsContainer');
+              allChartsRef.appendChild(chartDiv);
+
+          }
+
+      }
+
+      class Positioner {
+          constructor(numRows, numTrails) {
+              this.numTrails = numTrails;
+              this.numRows = numRows;
+              this.positions = this.initPositions();
+          }
+
+          initPositions() {
+              let allPositions = [];
+              for (let i = 0; i < this.numTrails; i++) {
+                  let trailPositions = [];
+                  for (let j = 0; j < this.numRows; j++) {
+                      for (let k = 0; k < this.numRows; k++) {
+                          trailPositions.push([j, k]);
+                      }
+                  }
+                  Grid.shuffle(trailPositions);
+                  allPositions.push(trailPositions);
+              }
+              return allPositions;
+          }
+
+          getPositions(trail) {
+              return this.positions[trail];
+          }
+
+      }
+
+
+      class LocalRelocator extends Relocator {
+
+          constructor() {
+              super();
+              this.name = "local";
+          }
+
+          relocate(agent, grid) {
+              let cells = this.getEmptyCellsOfClosestNeighbor(agent, grid);
+
+              if (cells.length === 0)
+                  return;
+
+              let swapX = cells[0][0];
+              let swapY = cells[0][1];
+
+              grid.matrix[swapX][swapY] = agent;
+              grid.matrix[agent.x][agent.y] = cellState.empty;
+              agent.x = swapX;
+              agent.y = swapY;
+          }
+
+          getEmptyCellsOfClosestNeighbor(agent, grid) {
+              let emptyCells = [];
+              let startX = agent.x - 1;
+              let startY = agent.y - 1;
+              let side = 3;
+
+              // let agentHappiness = grid.getHappyScore(agent.x, agent.y, agent.type);
+
+              while (side <= grid.nRows) {
+
+                  for (let i = startX; i <= startX + side; i++)
+                      for (let j = startY; j <= startY + side; j++)
+                          if (this.isLocationInScope(i, j, grid) && grid.matrix[i][j].type === agent.type) //  && grid.getHappyScore(i, j, agent.type) >= agentHappiness) // && grid.isAgentHappy(i, j, agent.type))
+                              emptyCells = emptyCells.concat(this.getEmptyNeighbors(grid.matrix[i][j], grid));
+
+                  if (emptyCells.length > 0)
+                      break;
+
+                  side += 2;
+                  startX--;
+                  startY--;
+              }
+              Grid.shuffle(emptyCells);
+              return emptyCells;
+          }
+
+
+          isLocationInScope(i, j, grid) {
+              return i >= 0 && i < grid.nRows && j >= 0 && j < grid.nRows;
+          }
+
+          getEmptyNeighbors(agent, grid) {
+              let emptyCells = [];
+              for (let i = agent.x - 1; i <= agent.x + 1; i++)
+                  for (let j = agent.y - 1; j <= agent.y + 1; j++)
+                      if (this.isLocationInScope(i, j, grid) && (i !== agent.x || j !== agent.y))
+                          if (grid.matrix[i][j] === cellState.empty)
+                              emptyCells.push([i, j]);
+              return emptyCells;
+          }
+
+      }
+
+  </script>
+
+  <!-- ------------------------------------------------------------- -->
+
   <meta charset="utf-8">
-  <title>RedBlue</title>
+  <title>Segregation Model</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Place favicon.ico in the root directory -->
 
-  <link rel="stylesheet" href="../css/bootstrap.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 
   <meta name="theme-color" content="#fafafa">
 
@@ -238,26 +1207,6 @@
   <div id="allChartsContainer" class="row" style="padding-top: 50px"></div>
 
 </div>
-
-
-<!-- -------------------------------------------------------------- -->
-
-<script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
-
-<script src="main.js"></script>
-<script src="grid.js"></script>
-<script src="relocators.js"></script>
-<script src="trail_manager.js"></script>
-<script src="stats_manager.js"></script>
-<script src="ui_manager.js"></script>
-<script src="positioner.js"></script>
-<script src="local_relocator.js"></script>
-
-<!-- ------------------------------------------------------------- -->
 
 </body>
 
