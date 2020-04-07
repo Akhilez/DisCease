@@ -2,15 +2,15 @@ width = 300;
 
 // ------------ Parameters ---------------------
 
-let numRows = 5;
+let numRows = 50;
 let numAgents = Math.floor(numRows * numRows * 0.9);
 let numTrails = 2;
-let numEpochs = 10;
+let numEpochs = 15;
 
-let maxCheck = 10;  // This is q
+let maxCheck = 100;  // This is q
 let k_neighbours = 4;    // This is k
 
-let numFriends = 5;      // This is n  [5, 10, 20, 25]
+let numFriends = 25;      // This is n  [5, 10, 20, 25]
 let p = 3;  // [3, 5, 7]
 
 // ------------ END Parameters -----------------
