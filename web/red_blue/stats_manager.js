@@ -6,7 +6,7 @@ class StatsManager {
     this.currentEpoch = {timeSteps: []};
     this.data = {trails: []};
 
-    /*
+
     // sample data:
     let data = {
       avgHappiness: 0,
@@ -23,9 +23,17 @@ class StatsManager {
           avgHappiness: 123,
           numHappyAgents: 10,
         }
+      ],
+      avgEpochs: [
+        {
+          epoch: 1,
+          avgHappiness: 3.4,
+          numHappyAgents: 2230,
+          standardDeviation: 2.3,
+        },
       ]
     };
-    */
+
 
   }
 
@@ -64,7 +72,7 @@ class StatsManager {
     this.currentTrail = {epochs: []};
   }
 
-  atEnd(){
+  atEnd() {
     this.data.avgHappiness = 0;
     this.data.avgNumHappyAgents = 0;
     this.data.trails.forEach(trail => {
@@ -74,7 +82,55 @@ class StatsManager {
     this.data.avgHappiness /= this.data.trails.length;
     this.data.avgNumHappyAgents /= this.data.trails.length;
 
+    this.setAverageEpochValues();
+
     this.game.ui.updateAtEnd(this.data);
+  }
+
+  setAverageEpochValues() {
+
+    this.data.avgEpochs = [];
+    for (let epoch = 0; epoch < this.game.trailManager.numEpochsPerTrail; epoch++) {
+      let epochData = {
+        epoch: epoch + 1,
+        avgHappiness: 0,
+        numHappyAgents: 0,
+      };
+      let happyAgentNumbers = [];
+      for (let trail = 0; trail < this.game.trailManager.numTrails; trail++) {
+        let currentEpoch = this.data.trails[trail].epochs[epoch];
+        epochData.avgHappiness += currentEpoch.avgHappiness;
+        epochData.numHappyAgents += currentEpoch.numHappyAgents;
+        happyAgentNumbers.push(currentEpoch.numHappyAgents);
+      }
+      epochData.standardDeviation = StatsManager.standardDeviation(happyAgentNumbers);
+      epochData.avgHappiness /= this.game.trailManager.numTrails;
+      epochData.numHappyAgents /= this.game.trailManager.numTrails;
+
+      this.data.avgEpochs.push(epochData);
+    }
+  }
+
+
+  static standardDeviation(values) {
+    let avg = StatsManager.average(values);
+
+    let squareDiffs = values.map(function (value) {
+      let diff = value - avg;
+      return diff * diff;
+    });
+
+    let avgSquareDiff = StatsManager.average(squareDiffs);
+
+    return Math.sqrt(avgSquareDiff);
+  }
+
+  static average(data) {
+    let sum = data.reduce(function (sum, value) {
+      return sum + value;
+    }, 0);
+
+    return sum / data.length;
   }
 
 }

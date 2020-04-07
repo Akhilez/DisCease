@@ -29,7 +29,7 @@ class UIManager {
     this.currentEpochChart.data.datasets[lastDataIndex].data.push(currentEpoch.avgHappiness);
     this.currentEpochChart.update();
 
-    this.addTableRow(this.game.trailManager.trail, this.game.trailManager.epoch, currentEpoch.numHappyAgents, currentEpoch.avgHappiness);
+    this.addTableRow(this.game.trailManager.trail, this.game.trailManager.epoch, currentEpoch.numHappyAgents, currentEpoch.avgHappiness.toFixed(2));
 
   }
 
@@ -48,12 +48,17 @@ class UIManager {
     this.currentTrailChart.data.labels.push(this.game.trailManager.trail);
     this.currentTrailChart.update();
 
-    this.addTableRow(this.game.trailManager.trail, '-', currentTrail.numHappyAgents, currentTrail.avgHappiness);
+    this.addTableRow(this.game.trailManager.trail, '-', currentTrail.numHappyAgents, currentTrail.avgHappiness.toFixed(2));
 
   }
 
   updateAtEnd(data) {
-    this.addTableRow("Average", '-', data.avgNumHappyAgents, data.avgHappiness)
+    this.addTableRow("Average", '-', data.avgNumHappyAgents, data.avgHappiness.toFixed(2));
+    this.addTableRow("Trails", "Epochs", "#Happy", "StdDev");
+
+    for (let avgEpoch of data.avgEpochs) {
+      this.addTableRow("All", avgEpoch.epoch, avgEpoch.numHappyAgents, avgEpoch.standardDeviation);
+    }
   }
 
   addTableRow(trail, epoch, avgSameNeighbours, happiness) {
@@ -67,7 +72,7 @@ class UIManager {
     colTrail.innerHTML = trail;
     colEpoch.innerHTML = epoch;
     colAvgSameNeighbours.innerHTML = avgSameNeighbours;
-    colHappiness.innerHTML = happiness.toFixed(2);
+    colHappiness.innerHTML = happiness;
   }
 
   initTrailsChart() {

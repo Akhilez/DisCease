@@ -1,0 +1,264 @@
+<!doctype html>
+
+<!------------------------------------------------------------------
+
+
+
+
+-------------------------------------------------------------------->
+
+
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>RedBlue</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="../css/bootstrap.css">
+
+  <meta name="theme-color" content="#fafafa">
+
+  <style>
+    .barLabel {
+      width: 50px;
+    }
+
+    .canvasWidth {
+      width: 300px;
+    }
+
+    .statsTable {
+      width: 300px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<!-- -------------------------------------------------------------- -->
+
+<div style="padding: 50px">
+
+  <h1>Complex Systems Homework 2</h1>
+
+  <div class="row">
+
+    <div class="col-auto">
+      <h3>Type 1: Random relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Step</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="timeStepBar-random"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-random"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-random"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-random-policy"></div>
+      <table id="statsTable-random" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>happy #</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
+    </div>
+
+
+    <div class="col-auto">
+      <h3>Type 2: Friends relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Step</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="timeStepBar-friend"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-friend"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-friend"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-friend-policy"></div>
+      <table id="statsTable-friend" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>happy #</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
+    </div>
+
+
+    <div class="col-auto">
+      <h3>Type 3: Swap relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Step</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="timeStepBar-swap"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-swap"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-swap"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-swap-policy"></div>
+      <table id="statsTable-swap" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>happy #</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
+    </div>
+
+
+    <div class="col-auto">
+      <h3>Type 4: Local relocation</h3>
+      <table class="canvasWidth">
+        <tr>
+          <td class="barLabel">Step</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="timeStepBar-local"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Epoch</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="epochBar-local"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="barLabel">Trail</td>
+          <td>
+            <div class="progress bar">
+              <div class="progress-bar" role="progressbar" aria-valuenow="70" id="trailBar-local"
+                   aria-valuemin="0" aria-valuemax="100" style="width:0">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div id="red-blue-sketch-holder-local-policy"></div>
+      <table id="statsTable-local" class="table-sm table-striped table-bordered statsTable">
+        <tr>
+          <th>Trail</th>
+          <th>Epoch</th>
+          <th>happy #</th>
+          <th>Happiness</th>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="allChartsContainer" class="row" style="padding-top: 50px"></div>
+
+</div>
+
+
+<!-- -------------------------------------------------------------- -->
+
+<script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
+
+<script src="main.js"></script>
+<script src="grid.js"></script>
+<script src="relocators.js"></script>
+<script src="trail_manager.js"></script>
+<script src="stats_manager.js"></script>
+<script src="ui_manager.js"></script>
+<script src="positioner.js"></script>
+<script src="local_relocator.js"></script>
+
+<!-- ------------------------------------------------------------- -->
+
+</body>
+
+</html>
