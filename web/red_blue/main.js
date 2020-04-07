@@ -2,16 +2,16 @@ width = 300;
 
 // ------------ Parameters ---------------------
 
-let numRows = 6;
+let numRows = 50;
 let numAgents = Math.floor(numRows * numRows * 0.9);
-let numTrails = 3;
-let numEpochs = 3;
+let numTrails = 2;
+let numEpochs = 15;
 
-let maxCheck = numRows;  // This is q
-let k_neighbours = 5;    // This is k
+let maxCheck = 100;  // This is q
+let k_neighbours = 4;    // This is k
 
-let numFriends = 5;      // This is n
-let p = 7;
+let numFriends = 25;      // This is n  [5, 10, 20, 25]
+let p = 3;  // [3, 5, 7]
 
 // ------------ END Parameters -----------------
 
@@ -33,7 +33,7 @@ class Game {
 
   setup(sketch) {
     let canvas = sketch.createCanvas(width, width);
-    sketch.frameRate(120);
+    sketch.frameRate(250);
     canvas.parent(`red-blue-sketch-holder-${this.relocator.name}-policy`);
 
     this.grid.fillAgentsRandomly(numAgents);
