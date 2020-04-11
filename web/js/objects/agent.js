@@ -8,7 +8,7 @@ const state = {
 
 class Agent {
 
-  constructor (game, diseaseIdentificationProbability, deathRate, immunizationRate, deflections) {
+  constructor (game, deflections) {
     this.game = game;
     this.swarm = game.swarmManager;
     this.mass = 1;
@@ -21,11 +21,9 @@ class Agent {
     this.acceleration = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side)); // p5.Vector(p5.random(-width, width), random(-height, height));
 
     // Hyper-parameters
-    this.diseaseIdentificationProbability = diseaseIdentificationProbability; //*
+    this.diseaseIdentificationProbability = this.game.paramsInjector.params.swarmParams.diseaseIdentificationProbability; //*
     this.visualRange = 30;
     this.zombificationRate = 0.002;
-    this.deathRate = deathRate; //*
-    this.immunizationRate = immunizationRate; //*
     this.immunizationLossRate = 0.001;
 
     // Internal State Variables:
@@ -95,7 +93,7 @@ class Agent {
         observedHealth = neighbour.healthState;
 
       let pointer = p5.Vector.sub(neighbour.location, this.location);
-      pointer.mult(this.deflections[this.healthState][neighbour.healthState]);
+      pointer.mult(this.deflections[this.healthState][observedHealth]);
 
       nextMove.add(pointer);
       nextMove.normalize();
@@ -146,7 +144,7 @@ class Agent {
     let px = this.game.p5.random();
 
     if (this.healthState === state.healthy) {
-      if (px <= this.immunizationRate) {
+      if (px <= this.swarm.immunizationRate) {
         this.healthState = state.immune;
         return;
       }
@@ -164,18 +162,18 @@ class Agent {
     }
 
     if (this.healthState === state.zombie) {
-      if (px <= this.deathRate) {
+      if (px <= this.swarm.deathRate) {
         this.healthState = state.dead;
       }
       return;
     }
 
     if (this.healthState === state.diseased) {
-      if (px * this.numDiseaseSpread / this.numDiseaseSpread <= this.deathRate) {
+      if (px * this.numDiseaseSpread / this.numDiseaseSpread <= this.swarm.deathRate) {
         this.healthState = state.dead;
         return;
       }
-      if (px <= this.immunizationRate) {
+      if (px <= this.swarm.immunizationRate) {
         this.healthState = state.immune;
         return;
       }

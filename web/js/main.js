@@ -1,8 +1,3 @@
-let immunizationRateSlider;
-let deathRateSlider;
-let diseaseProbabilitySlider;
-
-
 class Game {
   constructor(){
     this.paramsInjector = ParameterInjector.getInstance();
@@ -34,7 +29,7 @@ class Game {
 
     if (this.episodeManager.isNewEpisode()) {
       this.swarmManager.finishEpisode();
-      this.swarmManager.initEpisode(0.8, 0.001, 0.0001);
+      this.swarmManager.initEpisode();
     }
 
     this.swarmManager.updateAll(this.episodeManager);

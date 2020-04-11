@@ -24,6 +24,8 @@ class UIManager {
     let self = this;
     let params = this.game.paramsInjector;
 
+    // TODO: Update slider to the values in params.
+
     this.contagionSlider.onchange = function() {
       params.params.swarmParams.contagionRate = self.contagionSlider.value;
       params.updateAll();

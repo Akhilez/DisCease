@@ -23,16 +23,17 @@ class SwarmManager {
     this.diseaseIntroductionRate = params.diseaseIntroductionRate;
     this.forceOfAttraction = params.forceOfAttraction;
     this.contagionRate = params.contagionRate;
+    this.immunizationRate = params.immunizationRate;
   }
 
-  initEpisode(diseaseProbability, deathRate, ImmunizationRate) {
+  initEpisode() {
 
     this.agents.sort((agent_1, agent_2) => agent_1.getScore() - agent_2.getScore());
     // TODO: Pick half of best
 
     // Add new agents into the mix
     for (let i = this.agents.length; i < this.numAgents; i++) {
-      let agent = new Agent(this.game, diseaseProbability, deathRate, ImmunizationRate);
+      let agent = new Agent(this.game);
       // TODO: Give the new agent genes from roulette wheel (high prob to best gene (best = max of agent.getScore()))
       // TODO: Perform a perturbation of this.mutation on the genes.
       this.agents.push(agent);
@@ -57,8 +58,8 @@ class SwarmManager {
   updateAll(episodeManager) {
     this.introduceDisease(episodeManager);
     this.agents.forEach(agent => agent.update(this.agents));
-    let groupCenters = this.getGroupCenters();
-    this.agents.forEach(agent => agent.applyForce(this.getGroupCenterVector(agent, groupCenters[agent.healthState])))
+    // let groupCenters = this.getGroupCenters();
+    // this.agents.forEach(agent => agent.applyForce(this.getGroupCenterVector(agent, groupCenters[agent.healthState])))
   }
 
   displayAll(sketch) {
@@ -86,7 +87,7 @@ class SwarmManager {
 
   getGroupCenter(group) {
     let side = this.game.paramsInjector.params.uiParams.side;
-    return this.game.p5.createVector( side / 2, side / 2); // This is a global center. Must be a group's center. group = agents of same health state
+    return this.game.p5.createVector( side / 2, side / 2); // TODO: This is a global center. Must be a group's center. group = agents of same health state
   }
 
   getGroupCenterVector(agent, center) {

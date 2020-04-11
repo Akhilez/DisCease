@@ -8,10 +8,10 @@ class ParameterInjector {
         timeStepsPerEpisode: 100,
       },
       swarmParams: {
-        numAgents: 50,
+        numAgents: 100,
         mutation: 0.1,
         diseaseIntroductionRate: 0.01,
-        forceOfAttraction: 0.002,
+        forceOfAttraction: 0.002,  // global force
         diseaseIdentificationProbability: 0,
         contagionRate: 0,
         visualRange: 0,
