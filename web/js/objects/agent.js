@@ -8,23 +8,18 @@ const state = {
 
 class Agent {
 
-  constructor (game, deflections) {
+  constructor(game, deflections) {
     this.game = game;
     this.swarm = game.swarmManager;
     this.mass = 1;
     this.maxVelocity = 2;
     this.drag = 0.005;
+    this.diameter = 10;
 
     let side = this.game.paramsInjector.params.uiParams.side;
     this.location = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side));
     this.velocity = this.game.p5.createVector(0.0, 0.0);
     this.acceleration = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side)); // p5.Vector(p5.random(-width, width), random(-height, height));
-
-    // Hyper-parameters
-    this.diseaseIdentificationProbability = this.game.paramsInjector.params.swarmParams.diseaseIdentificationProbability; //*
-    this.visualRange = 30;
-    this.zombificationRate = 0.002;
-    this.immunizationLossRate = 0.001;
 
     // Internal State Variables:
     this.healthState = state.healthy;
@@ -36,7 +31,7 @@ class Agent {
     if (deflections != null)
       this.deflections = deflections;
     else
-      this.deflections = this.getRandomDeflections();
+      this.deflections = this.getPerfectDeflections();
 
   }
 
@@ -67,7 +62,7 @@ class Agent {
   display(sketch) {
     sketch.fill(sketch.color(this._getColor()));
     sketch.stroke(200);
-    sketch.ellipse(this.location.x, this.location.y, 10, 10);
+    sketch.ellipse(this.location.x, this.location.y, this.diameter, this.diameter);
   }
 
   _updateLocation() {
@@ -89,22 +84,22 @@ class Agent {
       nextMove = this.game.p5.createVector(0.0, 0.0);
 
       let observedHealth = state.healthy;
-      if (this.game.p5.random() <= this.diseaseIdentificationProbability)
+      if (this.game.p5.random() <= this.swarm.diseaseIdentificationProbability)
         observedHealth = neighbour.healthState;
 
       let pointer = p5.Vector.sub(neighbour.location, this.location);
       pointer.mult(this.deflections[this.healthState][observedHealth]);
 
       nextMove.add(pointer);
-      nextMove.normalize();
+      // nextMove.normalize();
     }
 
-    return nextMove;
+    return nextMove.normalize().mult(2);
   }
 
   checkBounds() {
     let side = this.game.paramsInjector.params.uiParams.side;
-    let padding = 5;
+    let padding = this.swarm.boxPadding + this.diameter / 2;
     if (this.location.x > side - padding) {
       this.velocity.x = -Math.abs(this.velocity.x);
       this.acceleration.x = 0;
@@ -126,7 +121,7 @@ class Agent {
     let neighbors = [];
 
     for (let agent of allAgents) {
-      if (this.isInVisualRange(this.location.x, this.location.y, agent)) {
+      if (this.isInVisualRange(agent)) {
         neighbors.push(agent);
       }
     }
@@ -135,8 +130,25 @@ class Agent {
   }
 
   //checking if in same range
-  isInVisualRange(x, y, agent) {
-    return (Math.abs(agent.location.x - x) <= this.visualRange && Math.abs(agent.location.y - y) <= this.visualRange);
+  isInVisualRange(agent) {
+    let xInRange = Math.abs(agent.location.x - this.location.x) <= this.swarm.visualRange;
+    let yInRange = Math.abs(agent.location.y - this.location.y) <= this.swarm.visualRange;
+    let inVisualRange = xInRange && yInRange;
+
+    if (inVisualRange)
+      this.dontOverlap(agent);
+
+    return inVisualRange
+  }
+
+  dontOverlap(agent){
+    let distanceVector = p5.Vector.sub(agent.location, this.location);
+    let distance = distanceVector.mag();
+    if (distance < this.diameter) {
+      distanceVector.mult(-1);
+      distanceVector.setMag((this.diameter - distance));
+      this.velocity.add(distanceVector);
+    }
   }
 
   checkContaminated(neighbours) {
@@ -150,21 +162,18 @@ class Agent {
       }
     }
 
-    if (this.healthState === state.dead) {
+    if (this.healthState === state.dead)
       return;
-    }
 
     if (this.healthState === state.immune) {
-      if (px <= this.immunizationLossRate) {
+      if (px <= this.swarm.immunizationLossRate)
         this.healthState = state.healthy;
-      }
       return;
     }
 
     if (this.healthState === state.zombie) {
-      if (px <= this.swarm.deathRate) {
+      if (px <= this.swarm.deathRate)
         this.healthState = state.dead;
-      }
       return;
     }
 
@@ -177,7 +186,7 @@ class Agent {
         this.healthState = state.immune;
         return;
       }
-      if (px <= this.zombificationRate) {
+      if (px <= this.swarm.zombificationRate) {
         this.healthState = state.zombie;
         return;
       }
