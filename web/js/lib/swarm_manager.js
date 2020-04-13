@@ -52,8 +52,9 @@ class SwarmManager {
       if (Math.random() < 0.5) {
         nextGenAgents.push(new Agent(this.game));
       } else {
-        nextGenAgents.push(new Agent(this.game));
-        //nextGenAgents.push(rouletteWheelAgents[Math.floor(Math.random() * rouletteWheelAgents.length)]);
+        // nextGenAgents.push(new Agent(this.game));
+        let randomIndex = Math.floor(Math.random() * rouletteWheelAgents.length);
+        nextGenAgents.push(rouletteWheelAgents[randomIndex]);
       }
     }
 
@@ -75,9 +76,8 @@ class SwarmManager {
 
   getRouletteWheelProbabilities() {
     let scores = this.agents.map((agent) => agent.getScore());
-    let maxScore = Math.max(...scores);
-    let minScore = Math.min(...scores);
-    scores = scores.map((score) => (score - minScore) / (maxScore - minScore + 1));
+    let sumOfScores = scores.reduce((a, b) => a + b);
+    scores = scores.map((score) => score / sumOfScores);
     return scores;
   }
 
