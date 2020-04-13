@@ -30,13 +30,8 @@ class SwarmManager {
 
     this.populateWithAgents();
 
-    // Randomize their positions and make them healthy.
-    for (let i = 0; i < this.numAgents; i++) {
-      let side = this.game.paramsInjector.params.uiParams.side;
-      this.agents[i].location = this.game.p5.createVector(this.game.p5.random(10, side - 10), this.game.p5.random(10, side - 10));
-      this.agents[i].acceleration = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side));
-      this.agents[i].healthState = state.healthy;
-    }
+    // Randomize their positions and make them healthy
+    this.agents.forEach((agent) => agent.initState());
 
   }
 
@@ -57,7 +52,8 @@ class SwarmManager {
       if (Math.random() < 0.5) {
         nextGenAgents.push(new Agent(this.game));
       } else {
-        nextGenAgents.push(rouletteWheelAgents[Math.floor(Math.random() * rouletteWheelAgents.length)]);
+        nextGenAgents.push(new Agent(this.game));
+        //nextGenAgents.push(rouletteWheelAgents[Math.floor(Math.random() * rouletteWheelAgents.length)]);
       }
     }
 
@@ -69,9 +65,9 @@ class SwarmManager {
     let agentProbabilities = this.getRouletteWheelProbabilities();
     let agentToPick = [];
     for (let i = 0; i < agentProbabilities.length; i++) {
-      let agentCount = agentProbabilities[i] * 10000;
+      let agentCount = agentProbabilities[i] * this.numAgents;
       for (let j = 0; j < agentCount; j++) {
-        agentToPick.push(this.agents[i]);
+        agentToPick.push(new Agent(this.game, this.agents[i].deflections));
       }
     }
     return agentToPick;
@@ -81,7 +77,8 @@ class SwarmManager {
     let scores = this.agents.map((agent) => agent.getScore());
     let maxScore = Math.max(...scores);
     let minScore = Math.min(...scores);
-    return scores.map((score) => (score - minScore) / (maxScore - minScore));
+    scores = scores.map((score) => (score - minScore) / (maxScore - minScore + 1));
+    return scores;
   }
 
   mutate(agents) {

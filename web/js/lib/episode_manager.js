@@ -15,7 +15,7 @@ class EpisodeManager {
   }
 
   updateParams() {
-    let params = this.game.paramsInjector.params.swarmParams;
+    let params = this.game.paramsInjector.params.episodeParams;
     this.framesPerTimeStep = params.framesPerTimeStep;
     this.timeStepsPerEpisode = params.timeStepsPerEpisode;
   }
@@ -31,7 +31,7 @@ class EpisodeManager {
       if (this.timeStep >= this.timeStepsPerEpisode) {  // New episode starts
         this.episode++;
         this.timeStep = 1;
-        this.frame = 0;
+        this.frame = 1;
       }
     }
   }
@@ -39,6 +39,6 @@ class EpisodeManager {
   reset() {
     this.episode = 1;
     this.timeStep = 1;
-    this.frame = 0;
+    this.frame = 1;
   }
 }

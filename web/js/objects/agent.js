@@ -23,8 +23,8 @@ class Agent {
 
     // Internal State Variables:
     this.healthState = state.healthy;
-    this.numDiseased = 0;
-    this.numEpisodesSurvived = 0;
+    this.numDiseased = 1;
+    this.numEpisodesSurvived = 1;
     this.numDiseaseSpread = 1;  // Number of times this guy spread its disease to others.
 
     // Genetic Information:
@@ -33,6 +33,15 @@ class Agent {
     else
       this.deflections = this.getPerfectDeflections();
 
+  }
+
+  initState() {
+    let side = this.game.paramsInjector.params.uiParams.side;
+    this.location = this.game.p5.createVector(this.game.p5.random(10, side - 10), this.game.p5.random(10, side - 10));
+    this.acceleration = this.game.p5.createVector(this.game.p5.random(-side, side), this.game.p5.random(-side, side));
+    this.healthState = state.healthy;
+    this.numDiseased = 1;
+    this.numDiseaseSpread = 1;
   }
 
   getScore() {
@@ -141,7 +150,7 @@ class Agent {
     return inVisualRange
   }
 
-  dontOverlap(agent){
+  dontOverlap(agent) {
     let distanceVector = p5.Vector.sub(agent.location, this.location);
     let distance = distanceVector.mag();
     if (distance < this.diameter) {
